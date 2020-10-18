@@ -1,5 +1,5 @@
 # W-Store-Plugin
-Това е официалният плъгин на W-STORE.ORG за играта Minecraft
+Тук се намират офицялните плъгини за W-Store CS 1.6 и Minecraft
 
 <h4>Команди към плъгина:</h4>
 
