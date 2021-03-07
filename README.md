@@ -6,6 +6,8 @@
 <ol>
   <li><code>ws reload</code> - Plugin reload</li>
   <li><code>ws force</code> - Изпълняване на всички направени поръчки, преди <b>payments-scheduler</b> времето което сте въвели.</li>
+  <li><code>ws setkey <key></code> - Задаване на server-key.</li>
+  <li><code>ws settime</code> - Промяна на времето за проверка в тикове. Като не може да бъде по-малко от 1200.</li>
 </ol>
 <hr>
 <h4>Как да инсталираме правилно WStore плъгина.</h4>
