@@ -1,0 +1,10 @@
+main: me.lightdream.wstore.WStore
+name: W-Store
+version: 2.3
+api-version: 1.13
+commands:
+  w-store:
+    aliases:
+      - ws
+      - wstore
+    permission: wstore.admin
