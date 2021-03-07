@@ -49,7 +49,7 @@ public class CommandWStore implements CommandExecutor {
 
 		}
 
-		sender.sendMessage("§cUse §e/wstore reload or force");
+		sender.sendMessage("§cUse §e/wstore reload, force, setkey, settime");
 		return true;
 
 	}
