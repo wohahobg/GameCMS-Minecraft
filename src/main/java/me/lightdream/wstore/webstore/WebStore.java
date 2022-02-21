@@ -27,7 +27,7 @@ public class WebStore {
 	private BukkitTask task;
 	
 	private final Gson gson = new Gson();
-	private final String API = "https://api.w-store.org";
+	private final String API = "https://api.gamecms.org";
 	
 	public WebStore(WStore plugin) {
 		this.plugin = plugin;
