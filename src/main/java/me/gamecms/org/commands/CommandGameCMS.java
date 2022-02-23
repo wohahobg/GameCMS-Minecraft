@@ -1,10 +1,14 @@
 package me.gamecms.org.commands;
 
 import me.gamecms.org.GameCMS;
+import me.gamecms.org.balance.Balance;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 
 public class CommandGameCMS implements CommandExecutor {
