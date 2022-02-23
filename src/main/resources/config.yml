@@ -1,0 +1,3 @@
+server-key: 'api_key'
+payments-scheduler: 1200
+broadcast-payment: true

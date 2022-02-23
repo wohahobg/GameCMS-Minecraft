@@ -1,0 +1,12 @@
+main: me.gamecms.org.GameCMS
+name: GameCMS
+authors: [ Wohhao ]
+description: Execute commands from a site provided by gamecms.org
+website: gamecms.org
+version: 2.5
+commands:
+  gcms:
+    aliases:
+      - gamecms
+      - game-cms
+    permission: gamecms.admin
