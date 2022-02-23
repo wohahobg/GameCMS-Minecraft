@@ -16,6 +16,7 @@ public class Balance {
 
     GameCMS plugin;
 
+
     private final Gson gson = new Gson();
     private final String API;
     private Object ArrayList;

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class GameCMS extends JavaPlugin {
 
 	private static GameCMS instance;
+	private String test;
 
 	private FileManager fileManager;
 	private PendingOrder pendingOrder;
