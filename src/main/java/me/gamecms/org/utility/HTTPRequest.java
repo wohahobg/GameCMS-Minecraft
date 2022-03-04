@@ -70,6 +70,7 @@ public class HTTPRequest {
 		HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
 		httpURLConnection.setRequestMethod("POST");
 
+		//set user-agent
 		httpURLConnection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
 		httpURLConnection.setRequestProperty("Authorization", apiKey);
 
@@ -85,13 +86,13 @@ public class HTTPRequest {
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success
 			BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 			String inputLine;
-			StringBuffer response = new StringBuffer();
+			StringBuffer buffer = new StringBuffer();
 
 			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
+				buffer.append(inputLine);
 			}
 			in.close();
-			return response.toString();
+			return buffer.toString();
 		} else {
 			return "POST request not worked";
 		}
@@ -111,15 +112,16 @@ public class HTTPRequest {
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success
 			BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
 			String inputLine;
-			StringBuffer response = new StringBuffer();
+			StringBuffer buffer = new StringBuffer();
 
 			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
+				buffer.append(inputLine);
 			}
 			in.close();
-			return response.toString();
+			return buffer.toString();
 		} else {
-			return "POST request not worked";
+			return "GET request not worked";
 		}
 	}
+	
 }

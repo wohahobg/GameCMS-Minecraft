@@ -45,7 +45,7 @@ public class PendingOrder implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		System.out.println("[DEBUG]");
+		//System.out.println("[DEBUG]");
 		Player player = event.getPlayer();
 
 		BukkitTask pendingTask = plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, () -> {
