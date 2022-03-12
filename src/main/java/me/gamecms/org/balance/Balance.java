@@ -28,7 +28,7 @@ public class Balance {
 
     public Balance(GameCMS plugin) {
         this.plugin = plugin;
-        API = plugin.API_URL + "/websites/balance";
+        API = plugin.API_URL + "/websites/user/balance";
     }
 
     public String add(String username, double amount) {
@@ -67,7 +67,10 @@ public class Balance {
             json = HTTPRequest.sendGET(URL, apiKey);
         }
         String message = "Нещо се обърка, заявката не може да бъде изпълнена (Balance::69)";
-        if (json.startsWith("{\"status\":\"100\"") || json.startsWith("{\"status\":\"101\"")) {
+
+        if (json.startsWith("{\"status\":\"200\"") ||
+                json.startsWith("{\"status\":\"400\"") ||
+                json.startsWith("{\"status\":\"404\"")) {
             message = ((gson.fromJson(json, BalanceRequestResponse.class)).message);
         }
         return message;

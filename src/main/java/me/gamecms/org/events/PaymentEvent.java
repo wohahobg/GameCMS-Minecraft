@@ -1,6 +1,6 @@
 package me.gamecms.org.events;
 
-import me.gamecms.org.payment.Order;
+import me.gamecms.org.payment.Commands;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -8,13 +8,13 @@ public class PaymentEvent extends Event {
 	
 	private static final HandlerList handlerList = new HandlerList();
 	
-	private Order order;
+	private Commands order;
 	
-	public PaymentEvent(Order order) {
+	public PaymentEvent(Commands order) {
 		this.order = order;
 	}
 	
-	public Order getPayment() {
+	public Commands getPayment() {
 		return order;
 	}
 

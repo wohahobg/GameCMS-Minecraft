@@ -17,7 +17,7 @@ public class GameCMS extends JavaPlugin {
 	private PendingOrder pendingOrder;
 	private WebStore webStore;
 	private Balance balance;
-	public final String API_URL = "https://api.gamecms.org";
+	public final String API_URL = "https://api.gamecms.org/v2";
 
 	@Override
 	public void onLoad() {

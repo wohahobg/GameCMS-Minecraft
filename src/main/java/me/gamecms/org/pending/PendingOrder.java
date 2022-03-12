@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.payment.Order;
+import me.gamecms.org.payment.Commands;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -76,7 +76,7 @@ public class PendingOrder implements Listener {
 
 	}
 
-	public void prepareOrder(String username, Order order) {
+	public void prepareOrder(String username, Commands order) {
 
 		config.set(username + "." + order.id + ".id", order.id);
 		config.set(username + "." + order.id + ".username", order.username);
@@ -114,7 +114,7 @@ public class PendingOrder implements Listener {
 	
 	public void executeOrders(String username) {
 		
-		Map<String, Order> orders = getOrders(username);
+		Map<String, Commands> orders = getOrders(username);
 		
 		orders.values().forEach(payment -> plugin.getWebStore().execute(payment));
 		
@@ -123,9 +123,9 @@ public class PendingOrder implements Listener {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Order> getOrders(String username) {
+	public Map<String, Commands> getOrders(String username) {
 
-		Map<String, Order> orders = new HashMap<String, Order>();
+		Map<String, Commands> orders = new HashMap<String, Commands>();
 
 		if (config.getString(username) == null) {
 			return orders;
@@ -137,7 +137,7 @@ public class PendingOrder implements Listener {
 			List<String> commands = (List<String>) config.getList(username + "." + order + ".commands");
 			String order_message = config.getString(username + "." + order + ".order_message");
 
-			orders.put(order, new Order(order, username, must_be_online, commands, order_message));
+			orders.put(order, new Commands(order, username, must_be_online, commands, order_message));
 
 		}
 

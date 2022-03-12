@@ -1,10 +1,8 @@
 package me.gamecms.org.api;
 
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.payment.Order;
-import org.bukkit.Bukkit;
+import me.gamecms.org.payment.Commands;
 
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Map;
 
@@ -17,7 +15,7 @@ public class GameCMSApi {
 	}
 
 	// Displays all open payments.
-	public static Collection<Order> getPayments() throws Exception {
+	public static Collection<Commands> getPayments() throws Exception {
 		return GameCMS.getInstance().getWebStore().getPayments();
 	}
 
@@ -33,7 +31,7 @@ public class GameCMSApi {
 	}
 
 	// Stores the player's payment in 'pending_orders' when not online.
-	public static void prepareOrder(String username, Order order) {
+	public static void prepareOrder(String username, Commands order) {
 		GameCMS.getInstance().getPendingOrder().prepareOrder(username, order);
 	}
 
@@ -53,7 +51,7 @@ public class GameCMSApi {
 	}
 
 	// Shows all saved payments of the player.
-	public static Map<String, Order> getOrders(String username) {
+	public static Map<String, Commands> getOrders(String username) {
 		return GameCMS.getInstance().getPendingOrder().getOrders(username);
 	}
 
