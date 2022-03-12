@@ -1,3 +1,4 @@
 server-key: 'api_key'
 payments-scheduler: 1200
 broadcast-payment: true
+api-key: 'your_website_api_key'
