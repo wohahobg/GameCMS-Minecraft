@@ -57,7 +57,7 @@ public class HTTPRequest {
         //simple add empty json status as null so we can check easy if the status is 200 or etc.
         String result = ApiRequestResponseMain.bad_request_format;
         int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) { // success
+        if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NOT_FOUND || responseCode == HttpURLConnection.HTTP_BAD_REQUEST) { // success
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             while ((line = reader.readLine()) != null) {
