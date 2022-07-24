@@ -1,6 +1,7 @@
 package me.gamecms.org.utility;
 
-import me.gamecms.org.balance.BalanceRequestResponse;
+
+import me.gamecms.org.api.ApiRequestResponseMain;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,117 +12,63 @@ import java.net.URL;
 
 public class HTTPRequest {
 
-    public static void openUrl(String url) throws Exception {
 
-        try {
+    public static String sendPost(String apiURL, String params, String apiKey) throws IOException {
 
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("GET");
-            connection.setDoOutput(true);
-            connection.connect();
+        URL url = new URL(apiURL);
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-            StringBuilder results = new StringBuilder();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null) {
-                results.append(line);
-            }
-
-            connection.disconnect();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public static String readUrl(String url, String key) throws Exception {
-
-        BufferedReader bufferedReader = null;
-
-        try {
-
-            bufferedReader = new BufferedReader(new InputStreamReader(new URL(url).openStream(), "UTF-8"));
-            StringBuffer buffer = new StringBuffer();
-
-            int read;
-            char[] chars = new char[1024];
-
-            while ((read = bufferedReader.read(chars)) != -1) {
-                buffer.append(chars, 0, read);
-            }
-
-            return buffer.toString();
-
-        } finally {
-
-            if (bufferedReader != null) {
-                bufferedReader.close();
-            }
-
-        }
-    }
-
-
-    public static String sendPost(String url, String params, String apiKey) throws IOException {
-        URL obj = new URL(url);
-
-        HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
-        httpURLConnection.setRequestMethod("POST");
+        //request setup
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
 
         //set user-agent
-        httpURLConnection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
-        httpURLConnection.setRequestProperty("Authorization", apiKey);
+        connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
+        connection.setRequestProperty("Authorization", "Bearer" + apiKey);
 
         // For POST only - START
-        httpURLConnection.setDoOutput(true);
-        OutputStream os = httpURLConnection.getOutputStream();
+        connection.setDoOutput(true);
+        OutputStream os = connection.getOutputStream();
         os.write(params.getBytes());
         os.flush();
         os.close();
         // For POST only - END
 
-        int responseCode = httpURLConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) { // success
-            BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            String inputLine;
-            StringBuffer buffer = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                buffer.append(inputLine);
-            }
-            in.close();
-            return buffer.toString();
-        } else {
-            return "POST request not worked";
-        }
+        return returnResponse(connection);
     }
 
 
-    public static String sendGET(String url, String apiKey) throws IOException {
-        URL obj = new URL(url);
+    public static String sendGET(String apiURL, String apiKey) throws IOException {
 
-        HttpURLConnection httpURLConnection = (HttpURLConnection) obj.openConnection();
-        httpURLConnection.setRequestMethod("GET");
+        URL url = new URL(apiURL);
 
-        httpURLConnection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
-        httpURLConnection.setRequestProperty("Authorization", apiKey);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
 
-        int responseCode = httpURLConnection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            String inputLine;
-            StringBuffer buffer = new StringBuffer();
+        connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
+        connection.setRequestProperty("Authorization", "Bearer " + apiKey);
 
-            while ((inputLine = in.readLine()) != null) {
-                buffer.append(inputLine);
+        return returnResponse(connection);
+    }
+
+    public static String returnResponse(HttpURLConnection connection) throws IOException {
+        BufferedReader reader;
+        String line;
+        StringBuilder responseContent = new StringBuilder();
+        //simple add empty json status as null so we can check easy if the status is 200 or etc.
+        String result = ApiRequestResponseMain.bad_request_format;
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) { // success
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
             }
-            in.close();
-            return buffer.toString();
-        } else {
-            return "GET request not worked";
+
+            reader.close();
+            connection.connect();
+            result = responseContent.toString();
         }
+        return result;
     }
 
 }

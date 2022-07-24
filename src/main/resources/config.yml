@@ -1,4 +1,5 @@
 server-key: 'api_key'
-payments-scheduler: 1200
-broadcast-payment: true
+commands-scheduler: 1200
+broadcast-commands-message: true
 api-key: 'your_website_api_key'
+use-placeholders: false

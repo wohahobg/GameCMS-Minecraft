@@ -1,33 +1,26 @@
 package me.gamecms.org.webstore;
 
-import java.util.ArrayList;
-import java.util.logging.Level;
 
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.events.PaymentEvent;
-import me.gamecms.org.payment.Commands;
-import me.gamecms.org.payment.PaymentRequestResponse;
 import me.gamecms.org.utility.DurationHelper;
 import me.gamecms.org.utility.HTTPRequest;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+import java.util.logging.Level;
+
 import com.google.gson.Gson;
 
 public class WebStore {
 
-    private GameCMS plugin;
-
-    private String key;
-
-    private long schedule;
-    private boolean shouldBroadcast;
+    private final GameCMS plugin;
 
     private BukkitTask task;
 
     private final Gson gson = new Gson();
-    private String API;
+    private final String API;
 
     public WebStore(GameCMS plugin) {
         this.plugin = plugin;
@@ -35,62 +28,50 @@ public class WebStore {
     }
 
     public void load() {
-
         long minSchedule = DurationHelper.getTickDurationFromFormat("m", 1);
-
-        if (schedule < minSchedule) {
-            schedule = minSchedule;
+        if (plugin.getConfigFile().getCommandsScheduler() < minSchedule) {
+            plugin.getConfigFile().setCommandsScheduler(minSchedule);
         }
-
-        this.key = plugin.getFileManager().getString("server-key");
-        this.schedule = plugin.getFileManager().getLong("payments-scheduler");
-        this.shouldBroadcast = plugin.getFileManager().getBoolean("broadcast-payment");
-
     }
 
     public void start() {
 
-        task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
+        task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
 
-            @Override
-            public void run() {
+            try {
 
-                try {
+                plugin.getLogger().log(Level.INFO, "Fetching all due players...");
 
-                    plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+                ArrayList<CommandsHelper> commands = this.getCommands();
 
-                    ArrayList<Commands> orders = plugin.getWebStore().getPayments();
+                for (CommandsHelper command : commands) {
 
-                    for (Commands order : orders) {
-
-                        if (order.must_be_online && Bukkit.getPlayer(order.username) == null) {
-                            plugin.getPendingOrder().prepareOrder(order.username, order);
-                            continue;
-                        }
-
-                        execute(order);
-
+                    if (command.must_be_online && Bukkit.getPlayer(command.username) == null) {
+                        plugin.getPendingCommands().saveCommand(command.username, command);
+                        continue;
                     }
 
-                    if (!orders.isEmpty()) {
+                    execute(command);
 
-                        try {
-                            plugin.getWebStore().completePayments();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + orders.size() + " found).");
-
-                } catch (Exception e) {
-                    plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
                 }
 
+                if (!commands.isEmpty()) {
+
+                    try {
+                        this.completePayments();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
+
+            } catch (Exception e) {
+                plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
             }
 
-        }, schedule, schedule);
+        }, plugin.getConfigFile().getCommandsScheduler(), plugin.getConfigFile().getCommandsScheduler());
 
     }
 
@@ -110,18 +91,18 @@ public class WebStore {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
 
             try {
-                ArrayList<Commands> orders = plugin.getWebStore().getPayments();
+                ArrayList<CommandsHelper> commands = plugin.getWebStore().getCommands();
 
-                for (Commands order : orders) {
-                    //TODO: Remove the comment
-                    if (order.must_be_online && Bukkit.getPlayer(order.username) == null) {
-                        plugin.getPendingOrder().prepareOrder(order.username, order);
+                for (CommandsHelper command : commands) {
+                    if (command.must_be_online && Bukkit.getPlayer(command.username) == null) {
+                        plugin.getPendingCommands().saveCommand(command.username, command);
                         continue;
                     }
-                    execute(order);
+
+                    execute(command);
                 }
 
-                if (!orders.isEmpty()) {
+                if (!commands.isEmpty()) {
 
                     try {
                         plugin.getWebStore().completePayments();
@@ -132,9 +113,9 @@ public class WebStore {
                 }
 
                 if (sender == null) {
-                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + orders.size() + " found).");
+                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
                 } else {
-                    sender.sendMessage("§aFetched due players §8(§e" + orders.size() + " found§8)§7.");
+                    sender.sendMessage("§aFetched due players §8(§e" + commands.size() + " found§8)§7.");
                 }
 
             } catch (Exception e) {
@@ -146,71 +127,39 @@ public class WebStore {
 
     }
 
-    public void execute(Commands order) {
+    public void execute(CommandsHelper commandsHandlers) {
 
-        if (shouldBroadcast())
-            if (order.order_message != null)
-                if (!order.order_message.equals(""))
-                    Bukkit.broadcastMessage(order.order_message.replace('&', '§'));
+        if (plugin.getConfigFile().getBroadcastCommandsMessage())
+            if (commandsHandlers.order_message != null)
+                if (!commandsHandlers.order_message.equals(""))
+                    Bukkit.broadcastMessage(commandsHandlers.order_message.replace('&', '§'));
+
 
         Bukkit.getScheduler().runTask(plugin, () -> {
-            order.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
-            plugin.getServer().getPluginManager().callEvent(new PaymentEvent(order));
+            commandsHandlers.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
+
+            plugin.getServer().getPluginManager().callEvent(new CommandsEvent(commandsHandlers));
         });
 
     }
 
-    public ArrayList<Commands> getPayments() throws Exception {
+    public ArrayList<CommandsHelper> getCommands() throws Exception {
 
-        ArrayList<Commands> orders = new ArrayList<>();
+        ArrayList<CommandsHelper> commands = new ArrayList<>();
 
-        String json = HTTPRequest.sendGET(API + "/queue/minecraft", key);
+        String response = HTTPRequest.sendGET(API + "/queue/minecraft", plugin.getConfigFile().getServerKey());
 
-        if (json.startsWith("{\"status\":\"200\"")) {
-            orders = (ArrayList<Commands>) ((gson.fromJson(json, PaymentRequestResponse.class)).data);
+        ApiRequestResponse responseResult = gson.fromJson(response, ApiRequestResponse.class);
+        if (responseResult.status == 200) {
+            commands = (ArrayList<CommandsHelper>) responseResult.data;
         }
-        return orders;
+
+        return commands;
 
     }
 
     public void completePayments() throws Exception {
-        HTTPRequest.sendGET(API + "/complete", key);
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public void setSchedule(long schedule) {
-
-        long minSchedule = DurationHelper.getTickDurationFromFormat("m", 1);
-
-        if (schedule < minSchedule) {
-            schedule = minSchedule;
-        }
-
-        this.schedule = schedule;
-        this.plugin.getFileManager().getConfig().set("payments-scheduler", schedule);
-        this.plugin.getFileManager().save();
-
-    }
-
-    public long getSchedule() {
-        return schedule;
-    }
-
-    public boolean shouldBroadcast() {
-        return shouldBroadcast;
-    }
-
-    public void setBroadcast(boolean broadcast) {
-        this.shouldBroadcast = broadcast;
-        this.plugin.getFileManager().getConfig().set("broadcast-payment", broadcast);
-        this.plugin.getFileManager().save();
+        HTTPRequest.sendGET(API + "/complete", plugin.getConfigFile().getServerKey());
     }
 
 }

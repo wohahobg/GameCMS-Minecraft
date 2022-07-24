@@ -1,73 +1,94 @@
 package me.gamecms.org;
 
-import me.gamecms.org.balance.Balance;
+import me.gamecms.org.api.ApiBase;
 import me.gamecms.org.commands.CommandGameCMS;
-import me.gamecms.org.file.FileManager;
-import me.gamecms.org.pending.PendingOrder;
+import me.gamecms.org.commands.CommandTabCompleter;
+import me.gamecms.org.file.ConfigFile;
+import me.gamecms.org.listener.PlayerListener;
+import me.gamecms.org.webstore.PendingCommands;
+import me.gamecms.org.placeholders.PlaceholdersRegister;
 import me.gamecms.org.webstore.WebStore;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 
-public class GameCMS extends JavaPlugin {
+public class GameCMS extends JavaPlugin{
 
-	private static GameCMS instance;
+    private static GameCMS instance;
 
-	private FileManager fileManager;
-	private PendingOrder pendingOrder;
-	private WebStore webStore;
-	private Balance balance;
-	public final String API_URL = "https://api.gamecms.org/v2";
+    private ConfigFile configFile;
+    private ApiBase apiBase;
+    private PendingCommands pendingCommands;
+    private WebStore webStore;
+    private PlaceholdersRegister placeholdersRegister;
 
-	@Override
-	public void onLoad() {
-		instance = this;
-	}
+    public final String API_URL = "https://api.gamecms.org/v2";
 
-	@Override
-	public void onEnable() {
-		
-		fileManager = new FileManager(this);
-		fileManager.initialize();
+    @Override
+    public void onLoad() {
+        instance = this;
+    }
 
-		pendingOrder = new PendingOrder(this);
-		//getServer().getPluginManager().registerEvents(pendingOrder, this);
-		pendingOrder.initialize();
+    @Override
+    public void onEnable() {
+        configFile = new ConfigFile(this);
+        configFile.initialize();
 
-		balance = new Balance(this);
+        //load the api
+        apiBase = new ApiBase(this);
 
-		webStore = new WebStore(this);
-		webStore.load();
-		webStore.start();
-		getCommand("gcms").setExecutor(new CommandGameCMS(this));
+        //load pending commands
+        pendingCommands = new PendingCommands(this);
+        pendingCommands.initialize();
 
-	}
+        //register placeholder if PlaceholderAPI exist
+        if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            placeholdersRegister = new PlaceholdersRegister(this);
+        }
 
-	@Override
-	public void onDisable() {
-		webStore.stop();
-	}
 
-	public static GameCMS getInstance() {
-		return instance;
-	}
+        //load webstore tasks
+        //se we can check simple every x times for new commands
+        webStore = new WebStore(this);
+        webStore.load();
+        webStore.start();
 
-	public FileManager getFileManager() {
-		return fileManager;
-	}
 
-	public PendingOrder getPendingOrder() {
-		return pendingOrder;
-	}
+        //load event listener
+        getServer().getPluginManager().registerEvents(new PlayerListener (this), this);
+        getCommand("gcms").setExecutor(new CommandGameCMS(this));
+        getCommand("gcms").setTabCompleter(new CommandTabCompleter());
+    }
 
-	public WebStore getWebStore() {
-		return webStore;
-	}
 
-	public String addBalance(String username, double amount) {
-		 return balance.add(username, amount);
-	}
-	public String checkBalance(String username) {
-		return balance.checkBalance(username);
-	}
+
+    @Override
+    public void onDisable() {
+        webStore.stop();
+    }
+
+
+    public static GameCMS getInstance() {
+        return instance;
+    }
+
+    public ConfigFile getConfigFile() {
+        return configFile;
+    }
+
+    public PendingCommands getPendingCommands() {
+        return pendingCommands;
+    }
+
+    public WebStore getWebStore() {
+        return webStore;
+    }
+
+    public ApiBase getApiBase() {
+        return apiBase;
+    }
+
+    public PlaceholdersRegister getPlaceholdersRegister(){
+        return placeholdersRegister;
+    }
+
 }

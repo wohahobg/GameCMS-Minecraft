@@ -10,3 +10,4 @@ commands:
       - gamecms
       - game-cms
     permission: gamecms.admin
+    permission-message: You don't have enough permission for this action.
