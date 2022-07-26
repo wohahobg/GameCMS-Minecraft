@@ -21,10 +21,6 @@ public class HTTPRequest {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
 
-        //set user-agent
-        connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
-        connection.setRequestProperty("Authorization", "Bearer" + apiKey);
-
         // For POST only - START
         connection.setDoOutput(true);
         OutputStream os = connection.getOutputStream();
@@ -33,7 +29,7 @@ public class HTTPRequest {
         os.close();
         // For POST only - END
 
-        return returnResponse(connection);
+        return returnResponse(connection, apiKey);
     }
 
 
@@ -44,20 +40,21 @@ public class HTTPRequest {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
+        return returnResponse(connection, apiKey);
+    }
+
+    public static String returnResponse(HttpURLConnection connection, String apiKey) throws IOException {
+        //set user-agent
         connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
         connection.setRequestProperty("Authorization", "Bearer " + apiKey);
 
-        return returnResponse(connection);
-    }
-
-    public static String returnResponse(HttpURLConnection connection) throws IOException {
         BufferedReader reader;
         String line;
         StringBuilder responseContent = new StringBuilder();
         //simple add empty json status as null so we can check easy if the status is 200 or etc.
         String result = ApiRequestResponseMain.bad_request_format;
         int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NOT_FOUND || responseCode == HttpURLConnection.HTTP_BAD_REQUEST) { // success
+        if (responseCode == HttpURLConnection.HTTP_OK) { // success
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             while ((line = reader.readLine()) != null) {
