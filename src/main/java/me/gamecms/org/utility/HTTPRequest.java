@@ -21,6 +21,10 @@ public class HTTPRequest {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
 
+        //set user-agent
+        connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
+        connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+
         // For POST only - START
         connection.setDoOutput(true);
         OutputStream os = connection.getOutputStream();
@@ -29,7 +33,7 @@ public class HTTPRequest {
         os.close();
         // For POST only - END
 
-        return returnResponse(connection, apiKey);
+        return returnResponse(connection);
     }
 
 
@@ -40,14 +44,13 @@ public class HTTPRequest {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 
-        return returnResponse(connection, apiKey);
-    }
-
-    public static String returnResponse(HttpURLConnection connection, String apiKey) throws IOException {
-        //set user-agent
         connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
         connection.setRequestProperty("Authorization", "Bearer " + apiKey);
 
+        return returnResponse(connection);
+    }
+
+    public static String returnResponse(HttpURLConnection connection) throws IOException {
         BufferedReader reader;
         String line;
         StringBuilder responseContent = new StringBuilder();
