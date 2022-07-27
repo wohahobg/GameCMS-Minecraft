@@ -24,6 +24,7 @@ public class HTTPRequest {
         //set user-agent
         connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
         connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+        connection.setRequestProperty("Accept", "application/json");
 
         // For POST only - START
         connection.setDoOutput(true);
@@ -46,6 +47,7 @@ public class HTTPRequest {
 
         connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
         connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+        connection.setRequestProperty("Accept", "application/json");
 
         return returnResponse(connection);
     }
@@ -57,16 +59,20 @@ public class HTTPRequest {
         //simple add empty json status as null so we can check easy if the status is 200 or etc.
         String result = ApiRequestResponseMain.bad_request_format;
         int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) { // success
-            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
+        if (responseCode == 200 || responseCode == 400 || responseCode == 404) {
+            if (responseCode == 200){
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            }else{
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            }
             while ((line = reader.readLine()) != null) {
                 responseContent.append(line);
             }
-
             reader.close();
             connection.connect();
             result = responseContent.toString();
+
         }
         return result;
     }
