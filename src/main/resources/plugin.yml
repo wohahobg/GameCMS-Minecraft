@@ -3,7 +3,7 @@ name: GameCMS
 authors: [ Wohaho ]
 description: Execute commands from a site provided by gamecms.org
 website: gamecms.org
-version: 2.6
+version: 2.7
 commands:
   gcms:
     aliases:
