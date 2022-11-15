@@ -57,6 +57,7 @@ public class PlayerJoinQuit implements Listener {
 
         plugin.getApiBase().user().userBalance.remove(player.getUniqueId());
 
+
         //cancel any task after player quit
         if (tasks.containsKey(player.getUniqueId())) {
             BukkitTask pendingTask = tasks.get(player.getUniqueId());

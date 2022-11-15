@@ -1,0 +1,8 @@
+#test
+api-key: "your-website-api-key"
+#test
+server-key: "your-server-api-key"
+#test
+commands-scheduler: "1200"
+broadcast-commands-message: "true"
+use-placeholders: "false"
