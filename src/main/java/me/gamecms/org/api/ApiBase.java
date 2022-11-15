@@ -11,9 +11,8 @@ public class ApiBase {
         plugin = gameCMS;
     }
 
-    public ApiUserBalance userBalance() {
-        return new ApiUserBalance(this);
+    public ApiUser user() {
+        return new ApiUser(this);
     }
-
 }
 

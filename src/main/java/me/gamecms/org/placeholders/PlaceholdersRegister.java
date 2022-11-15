@@ -1,7 +1,6 @@
 package me.gamecms.org.placeholders;
 
 
-import com.google.gson.Gson;
 import me.gamecms.org.GameCMS;
 
 
@@ -13,18 +12,18 @@ public class PlaceholdersRegister {
 
     private final GameCMS plugin;
 
-    public Map<UUID, String> balanceMap = new HashMap<>();
+    public Map<UUID, String> playerBalanceMap = new HashMap<>();
 
     public PlaceholdersRegister(GameCMS plugin) {
         this.plugin = plugin;
 
-        new PlaceholdersList(plugin).register();
+        new Placeholders(plugin).register();
 
     }
 
     public String getUserBalance(UUID playerUUID) {
-        if (balanceMap.containsKey(playerUUID)) {
-            return balanceMap.get(playerUUID);
+        if (playerBalanceMap.containsKey(playerUUID)) {
+            return playerBalanceMap.get(playerUUID);
         }
         return "0.00";
     }

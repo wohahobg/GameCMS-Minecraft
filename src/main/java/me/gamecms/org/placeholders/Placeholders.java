@@ -5,12 +5,11 @@ import me.gamecms.org.GameCMS;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-
-public class PlaceholdersList extends PlaceholdersBase {
+public class Placeholders extends PlaceholdersBase {
 
     private final GameCMS plugin;
 
-    public PlaceholdersList(GameCMS plugin) {
+    public Placeholders(GameCMS plugin) {
         this.plugin = plugin;
     }
 
@@ -19,10 +18,11 @@ public class PlaceholdersList extends PlaceholdersBase {
     {
         if (plugin.getConfigFile().getUsePlaceholders()) {
             if (params.equals("user_balance")) {
-                return plugin.getPlaceholdersRegister().getUserBalance(player.getUniqueId());
+                return plugin.getApiBase().user().getUserBalance(player.getUniqueId());
             }
         }
-
         return null;
     }
+
+
 }

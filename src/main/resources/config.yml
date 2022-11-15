@@ -1,5 +1,8 @@
-server-key: 'api_key'
-commands-scheduler: 1200
-broadcast-commands-message: true
-api-key: 'your_website_api_key'
-use-placeholders: false
+#test
+api-key: "your-website-api-key"
+#test
+server-key: "your-server-api-key"
+#test
+commands-scheduler: "1200"
+broadcast-commands-message: "true"
+use-placeholders: "false"

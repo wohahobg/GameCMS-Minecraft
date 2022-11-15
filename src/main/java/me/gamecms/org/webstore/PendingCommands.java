@@ -14,7 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitTask;
 
 public class PendingCommands implements Listener {
 
@@ -22,8 +21,6 @@ public class PendingCommands implements Listener {
 
 	private File file;
 	private FileConfiguration config;
-
-	private Map<UUID, BukkitTask> tasks;
 
 	public PendingCommands(GameCMS plugin) {
 		this.plugin = plugin;
@@ -33,7 +30,6 @@ public class PendingCommands implements Listener {
 		//TODO change pending_orders.yml to pending_commands.yml
 		file = new File(GameCMS.getInstance().getDataFolder(), "pending_orders.yml");
 		config = YamlConfiguration.loadConfiguration(file);
-		tasks = new HashMap<>();
 	}
 
 	public void onPlayerJoin(Player player){

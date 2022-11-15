@@ -1,12 +1,11 @@
-package me.gamecms.org.file;
+package me.gamecms.org.files;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import me.gamecms.org.GameCMS;
 import me.gamecms.org.utility.DurationHelper;
-import org.bukkit.Bukkit;
+import me.gamecms.org.utility.YamlCommenter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -35,13 +34,8 @@ public class ConfigFile {
         config = YamlConfiguration.loadConfiguration(file);
 
         if (!file.exists()) {
-            config.addDefault("server-key", "your_server_key");
-            config.addDefault("commands-scheduler", 1200);
-            config.addDefault("broadcast-commands-message", true);
-            config.addDefault("api-key", "your_api_key");
-            config.addDefault("use-placeholders", false);
-            config.options().copyDefaults(true);
-            save();
+            plugin.saveDefaultConfig();
+            YamlCommenter.addComment(file, "Your Comment",10);
         } else {
             //set api-key if does not exist
             if (!config.contains("api-key")) {
