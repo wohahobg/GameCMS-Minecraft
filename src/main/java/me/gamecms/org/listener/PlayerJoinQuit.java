@@ -10,19 +10,21 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class PlayerListener implements Listener {
-
+public class PlayerJoinQuit implements Listener {
 
     private final GameCMS plugin;
-    private final Gson gson = new Gson();
-    private Map<UUID, BukkitTask> tasks;
 
-    public PlayerListener(GameCMS gameCMS) {
-        plugin = gameCMS;
+    private final Gson gson = new Gson();
+
+    private final Map<UUID, BukkitTask> tasks;
+
+    public PlayerJoinQuit(GameCMS plugin) {
+        this.plugin = plugin;
         tasks = new HashMap<>();
     }
 
@@ -30,21 +32,21 @@ public class PlayerListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        BukkitTask pendingTask = plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+        System.out.println(player.getName());
+
+        BukkitTask pendingTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             plugin.getPendingCommands().onPlayerJoin(player);
-
-            //check if we should use placeholder
-            //if so we make http api call and add player to the balanceMap in getPlaceholdersRegister();
-            if (plugin.getConfigFile().getUsePlaceholders()) {
-                String response = plugin.getApiBase().userBalance().getBalance(player.getName());
-                ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
-                if (responseResult.status == 200) {
-                    plugin.getPlaceholdersRegister().balanceMap.put(player.getUniqueId(), responseResult.data.get("balance"));
-                }
-
-
+            String response = plugin.getApiBase().user().getBalance(player.getName());
+            ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
+            System.out.println(responseResult.data.get("balance"));
+            if (responseResult.status == 200) {
+                plugin.getApiBase().user().userBalance.put(player.getUniqueId(), responseResult.data.get("balance"));
             }
-        }, 20 * 5);
+
+            System.out.println(Arrays.asList(plugin.getApiBase().user().userBalance)); // method 1
+
+
+        }, 50, 2400);
 
         tasks.put(player.getUniqueId(), pendingTask);
 
@@ -57,9 +59,8 @@ public class PlayerListener implements Listener {
         //remove the player from the balanceMap for placeholder
         //we run this only if use-placeholder is true;
 
-        if (plugin.getPlaceholdersRegister().balanceMap.containsKey(player.getUniqueId())) {
-            plugin.getPlaceholdersRegister().balanceMap.remove(player.getUniqueId());
-        }
+        plugin.getApiBase().user().userBalance.remove(player.getUniqueId());
+
 
         //cancel any task after player quit
         if (tasks.containsKey(player.getUniqueId())) {
@@ -69,7 +70,18 @@ public class PlayerListener implements Listener {
             }
             tasks.remove(player.getUniqueId());
         }
+    }
 
 
+    public void stopTasks() {
+        if (!tasks.isEmpty()) {
+            for (BukkitTask task : tasks.values()) {
+                task.cancel();
+            }
+        }
+    }
+
+    private boolean isCollectionMapNullOrEmpty(final Map<?, ?> m) {
+        return m == null || m.isEmpty();
     }
 }

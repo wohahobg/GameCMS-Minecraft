@@ -3,11 +3,13 @@ package me.gamecms.org;
 import me.gamecms.org.api.ApiBase;
 import me.gamecms.org.commands.CommandGameCMS;
 import me.gamecms.org.commands.CommandTabCompleter;
-import me.gamecms.org.file.ConfigFile;
-import me.gamecms.org.listener.PlayerListener;
+import me.gamecms.org.files.ConfigFile;
+import me.gamecms.org.listener.PlayerJoinQuit;
+import me.gamecms.org.listener.VotingPlugin;
 import me.gamecms.org.webstore.PendingCommands;
-import me.gamecms.org.placeholders.PlaceholdersRegister;
+import me.gamecms.org.placeholders.Placeholders;
 import me.gamecms.org.webstore.WebStore;
+import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -19,7 +21,8 @@ public class GameCMS extends JavaPlugin{
     private ApiBase apiBase;
     private PendingCommands pendingCommands;
     private WebStore webStore;
-    private PlaceholdersRegister placeholdersRegister;
+    private boolean placeholders;
+    private PlayerJoinQuit playerListener;
 
     public final String API_URL = "https://api.gamecms.org/v2";
 
@@ -40,11 +43,16 @@ public class GameCMS extends JavaPlugin{
         pendingCommands = new PendingCommands(this);
         pendingCommands.initialize();
 
-        //register placeholder if PlaceholderAPI exist
-        if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            placeholdersRegister = new PlaceholdersRegister(this);
+        if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
+            //register placeholder if PlaceholderAPI exist
+           placeholders = new Placeholders(this).register();
         }
 
+        //register VotingPlugin event and add last voted time & site
+        if (this.getServer().getPluginManager().getPlugin("VotingPlugin") != null){
+            VotingPlugin votingPlugin = new VotingPlugin(this);
+            getServer().getPluginManager().registerEvents(votingPlugin, this);
+        }
 
         //load webstore tasks
         //se we can check simple every x times for new commands
@@ -52,20 +60,19 @@ public class GameCMS extends JavaPlugin{
         webStore.load();
         webStore.start();
 
-
+        playerListener = new PlayerJoinQuit(this);
         //load event listener
-        getServer().getPluginManager().registerEvents(new PlayerListener (this), this);
+        getServer().getPluginManager().registerEvents(playerListener, this);
         getCommand("gcms").setExecutor(new CommandGameCMS(this));
         getCommand("gcms").setTabCompleter(new CommandTabCompleter());
     }
 
 
-
     @Override
     public void onDisable() {
         webStore.stop();
+        playerListener.stopTasks();
     }
-
 
     public static GameCMS getInstance() {
         return instance;
@@ -87,8 +94,7 @@ public class GameCMS extends JavaPlugin{
         return apiBase;
     }
 
-    public PlaceholdersRegister getPlaceholdersRegister(){
-        return placeholdersRegister;
-    }
-
+//    public PlaceholdersRegister getPlaceholders() {
+//        return placeholders;
+//    }
 }

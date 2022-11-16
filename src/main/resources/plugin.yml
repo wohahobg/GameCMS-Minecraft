@@ -1,13 +1,25 @@
 main: me.gamecms.org.GameCMS
 name: GameCMS
 authors: [ Wohaho ]
-description: Execute commands from a site provided by gamecms.org
+description: Plugin for the platform GameCMS.ORG
 website: gamecms.org
-version: 2.7
+version: 2.7.1
 commands:
-  gcms:
+  gcms :
     aliases:
       - gamecms
       - game-cms
-    permission: gamecms.admin
-    permission-message: You don't have enough permission for this action.
+    description: Commands for GameCMS.ORG Plugin
+permissions:
+  gamecms.admin:
+    default: op
+    description: Allow players to have access to all plugin commands.
+  gamecms.checkplayerbalance:
+    default: op
+    description: Allow players to check others players balance on your website.
+  gamecms.addbalance:
+    default: op
+    description: Allow players to add balance to spcefic player on your website.
+  gamecms.verify:
+    default: op
+    description: Allow user to verify thiers profiles.

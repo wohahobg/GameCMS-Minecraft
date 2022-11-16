@@ -1,12 +1,10 @@
-package me.gamecms.org.file;
+package me.gamecms.org.files;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import me.gamecms.org.GameCMS;
 import me.gamecms.org.utility.DurationHelper;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -35,13 +33,7 @@ public class ConfigFile {
         config = YamlConfiguration.loadConfiguration(file);
 
         if (!file.exists()) {
-            config.addDefault("server-key", "your_server_key");
-            config.addDefault("commands-scheduler", 1200);
-            config.addDefault("broadcast-commands-message", true);
-            config.addDefault("api-key", "your_api_key");
-            config.addDefault("use-placeholders", false);
-            config.options().copyDefaults(true);
-            save();
+            plugin.saveDefaultConfig();
         } else {
             //set api-key if does not exist
             if (!config.contains("api-key")) {
@@ -110,7 +102,7 @@ public class ConfigFile {
         save();
     }
 
-    public boolean getBroadcastCommandsMessage() {
+    public boolean isBroadcastCommandsMessageEnabled() {
         return this.broadcastCommandsMessage;
     }
 
@@ -120,27 +112,19 @@ public class ConfigFile {
         save();
     }
 
-    public boolean getUsePlaceholders() {
+    public boolean isPlaceholdersEnabled() {
         return this.usePlaceholders;
     }
 
-
     public void save() {
-
         try {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    public static File getFile() {
-        return file;
+    public FileConfiguration getConfig() {
+        return config;
     }
-
-    public GameCMS getPlugin() {
-        return plugin;
-    }
-
 }

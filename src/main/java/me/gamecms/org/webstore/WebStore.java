@@ -129,7 +129,7 @@ public class WebStore {
 
     public void execute(CommandsHelper commandsHandlers) {
 
-        if (plugin.getConfigFile().getBroadcastCommandsMessage())
+        if (plugin.getConfigFile().isBroadcastCommandsMessageEnabled())
             if (commandsHandlers.order_message != null)
                 if (!commandsHandlers.order_message.equals(""))
                     Bukkit.broadcastMessage(commandsHandlers.order_message.replace('&', '§'));
