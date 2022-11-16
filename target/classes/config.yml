@@ -1,6 +1,0 @@
-api-key: "your-website-api-key"
-server-key: "your-server-api-key"
-commands-scheduler: "1200"
-broadcast-commands-message: "true"
-use-placeholders: "false"
-use-voting-plugin: "false"
