@@ -13,21 +13,17 @@ import java.util.List;
 public class CommandTabCompleter implements TabCompleter {
 
     private static final String[] COMMANDS = {
-            "reload",
-            "force",
-            "setserverkey",
-            "setscheduler",
-            "setapikey",
-            "addbalance",
-            "checkbalance",
-            "enableplaceholders",
-            "enablepapi",
-            "disableplaceholders",
-            "disablepapi",
-            "enablebroadcastcommandsmessage",
-            "enablebcm",
-            "disablebroadcastcommandsmessage",
-            "disablebcm",
+        "reload",
+        "force",
+        "setserverkey",
+        "setscheduler",
+        "setapikey",
+        "addbalance",
+        "checkbalance",
+        "usePlaceholders",
+        "usePapi",
+        "useBroadcastMessages",
+        "useBMC",
     };
 
     @Override

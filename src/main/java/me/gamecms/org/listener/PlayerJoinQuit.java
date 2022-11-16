@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -42,6 +43,9 @@ public class PlayerJoinQuit implements Listener {
                 plugin.getApiBase().user().userBalance.put(player.getUniqueId(), responseResult.data.get("balance"));
             }
 
+            System.out.println(Arrays.asList(plugin.getApiBase().user().userBalance)); // method 1
+
+
         }, 50, 2400);
 
         tasks.put(player.getUniqueId(), pendingTask);
@@ -70,7 +74,7 @@ public class PlayerJoinQuit implements Listener {
 
 
     public void stopTasks() {
-        if (!isCollectionMapNullOrEmpty(tasks)) {
+        if (!tasks.isEmpty()) {
             for (BukkitTask task : tasks.values()) {
                 task.cancel();
             }

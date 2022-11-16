@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import me.gamecms.org.GameCMS;
 import me.gamecms.org.utility.DurationHelper;
-import me.gamecms.org.utility.YamlCommenter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -35,7 +34,6 @@ public class ConfigFile {
 
         if (!file.exists()) {
             plugin.saveDefaultConfig();
-            YamlCommenter.addComment(file, "Your Comment",10);
         } else {
             //set api-key if does not exist
             if (!config.contains("api-key")) {
@@ -104,7 +102,7 @@ public class ConfigFile {
         save();
     }
 
-    public boolean getBroadcastCommandsMessage() {
+    public boolean isBroadcastCommandsMessageEnabled() {
         return this.broadcastCommandsMessage;
     }
 
@@ -114,27 +112,19 @@ public class ConfigFile {
         save();
     }
 
-    public boolean getUsePlaceholders() {
+    public boolean isPlaceholdersEnabled() {
         return this.usePlaceholders;
     }
 
-
     public void save() {
-
         try {
             config.save(file);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    public static File getFile() {
-        return file;
+    public FileConfiguration getConfig() {
+        return config;
     }
-
-    public GameCMS getPlugin() {
-        return plugin;
-    }
-
 }

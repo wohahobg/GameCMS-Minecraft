@@ -3,7 +3,7 @@ name: GameCMS
 authors: [ Wohaho ]
 description: Plugin for the platform GameCMS.ORG
 website: gamecms.org
-version: 2.7
+version: 2.7.1
 commands:
   gcms :
     aliases:

@@ -19,13 +19,11 @@ public class ApiUser {
 
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final String API_URL;
-    private final ApiBase API;
     private final GameCMS plugin;
     public Map<UUID, String> userBalance = new HashMap<>();
 
 
     public ApiUser(ApiBase ApiBase) {
-        API = ApiBase;
         plugin = ApiBase.plugin;
         API_URL = plugin.API_URL + "/websites/user";
     }
@@ -69,8 +67,8 @@ public class ApiUser {
 
 
     public String getUserBalance(UUID playerUUID) {
-        if (userBalance.containsKey(playerUUID)) {
-            return userBalance.get(playerUUID);
+        if (this.userBalance.containsKey(playerUUID)) {
+            return this.userBalance.get(playerUUID);
         }
         return "0.00";
     }

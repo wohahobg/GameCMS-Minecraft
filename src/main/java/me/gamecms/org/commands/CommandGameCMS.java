@@ -42,6 +42,18 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
 
+            if (commandKey.equalsIgnoreCase("reload") || commandKey.equalsIgnoreCase("rl")) {
+                if (!sender.hasPermission("gamecms.admin")) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+                System.out.println(Arrays.asList(plugin.getApiBase().user().userBalance)); // method 1
+                plugin.getConfigFile().initialize();
+                plugin.getWebStore().load();
+                sender.sendMessage(message("Конфигурационният файл е променена успешно."));
+                return true;
+            }
+
             if (commandKey.equalsIgnoreCase("force")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
@@ -107,49 +119,37 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
 
-            if (commandKey.equalsIgnoreCase("enablePlaceholders")
-                    || commandKey.equalsIgnoreCase("enablePapi")) {
+            if (commandKey.equalsIgnoreCase("usePlaceholders")
+                    || commandKey.equalsIgnoreCase("usePapi")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
-                plugin.getConfigFile().setUsePlaceholders(true);
-                sender.sendMessage(message("Изпозлването на Placeholders е активирано."));
-                return true;
-            }
-            if (commandKey.equalsIgnoreCase("disablePlaceholders")
-                    || commandKey.equalsIgnoreCase("disablePapi")) {
-                if (!sender.hasPermission("gamecms.admin")) {
-                    sender.sendMessage(noPermission());
-                    return false;
+                if (plugin.getConfigFile().isPlaceholdersEnabled()){
+                    plugin.getConfigFile().setUsePlaceholders(false);
+                    sender.sendMessage(message("Изпозлването на Placeholders е деактивирано."));
+                }else{
+                    plugin.getConfigFile().setUsePlaceholders(true);
+                    sender.sendMessage(message("Изпозлването на Placeholders е активирано."));
                 }
-                plugin.getConfigFile().setUsePlaceholders(false);
-                sender.sendMessage(message("Изпозлването на Placeholders е деактивирано."));
                 return true;
             }
 
-
-            if (commandKey.equalsIgnoreCase("enableBroadcastCommandsMessage")
-                    || commandKey.equalsIgnoreCase("enableBCM")) {
+            if (commandKey.equalsIgnoreCase("useBroadcastMessages")
+                    || commandKey.equalsIgnoreCase("useBMC")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
-                plugin.getConfigFile().setBroadcastCommandsMessage(true);
-                sender.sendMessage(message("Изпозлването на Broadcast съобшенията е активирано."));
-                return true;
-            }
-            if (commandKey.equalsIgnoreCase("disableBroadcastCommandsMessage")
-                    || commandKey.equalsIgnoreCase("disableBCM")) {
-                if (!sender.hasPermission("gamecms.admin")) {
-                    sender.sendMessage(noPermission());
-                    return false;
+                if (plugin.getConfigFile().isBroadcastCommandsMessageEnabled()){
+                    plugin.getConfigFile().setBroadcastCommandsMessage(false);
+                    sender.sendMessage(message("Изпозлването на Broadcast съобшенията е деактивирано."));
+                }else{
+                    plugin.getConfigFile().setBroadcastCommandsMessage(true);
+                    sender.sendMessage(message("Изпозлването на Broadcast съобшенията е активирано."));
                 }
-                plugin.getConfigFile().setBroadcastCommandsMessage(false);
-                sender.sendMessage(message("Изпозлването на Broadcast съобшенията е деактивирано."));
                 return true;
             }
-
 
             if (commandKey.equalsIgnoreCase("getBalance") || commandKey.equalsIgnoreCase("checkBalance")) {
                 if (!sender.hasPermission("gamecms.checkplayerbalance") && !sender.hasPermission("gamecms.admin")) {
