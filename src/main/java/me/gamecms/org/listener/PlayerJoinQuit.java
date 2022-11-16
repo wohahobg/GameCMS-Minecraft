@@ -32,19 +32,13 @@ public class PlayerJoinQuit implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        System.out.println(player.getName());
-
         BukkitTask pendingTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             plugin.getPendingCommands().onPlayerJoin(player);
             String response = plugin.getApiBase().user().getBalance(player.getName());
             ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
-            System.out.println(responseResult.data.get("balance"));
             if (responseResult.status == 200) {
                 plugin.getApiBase().user().userBalance.put(player.getUniqueId(), responseResult.data.get("balance"));
             }
-
-            System.out.println(Arrays.asList(plugin.getApiBase().user().userBalance)); // method 1
-
 
         }, 50, 2400);
 
