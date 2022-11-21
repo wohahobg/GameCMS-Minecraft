@@ -24,7 +24,7 @@ public class CommandTabCompleter implements TabCompleter {
             "usepapi",
             "usebroadcastmessages",
             "usebmc",
-            "link"
+            "verify"
     };
 
     @Override
