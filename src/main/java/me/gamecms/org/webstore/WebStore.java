@@ -129,11 +129,13 @@ public class WebStore {
 
     public void execute(CommandsHelper commandsHandlers) {
 
-        if (plugin.getConfigFile().isBroadcastCommandsMessageEnabled())
-            if (commandsHandlers.order_message != null)
-                if (!commandsHandlers.order_message.equals(""))
+        if (plugin.getConfigFile().isBroadcastCommandsMessageEnabled()) {
+            if (commandsHandlers.order_message != null) {
+                if (!commandsHandlers.order_message.equals("")) {
                     Bukkit.broadcastMessage(commandsHandlers.order_message.replace('&', '§'));
-
+                }
+            }
+        }
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             commandsHandlers.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));

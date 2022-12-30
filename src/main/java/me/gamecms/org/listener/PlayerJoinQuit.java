@@ -3,6 +3,7 @@ package me.gamecms.org.listener;
 import com.google.gson.Gson;
 import me.gamecms.org.GameCMS;
 import me.gamecms.org.api.ApiRequestResponseMain;
+import me.gamecms.org.api.UserBalance;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,7 +11,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -37,7 +37,8 @@ public class PlayerJoinQuit implements Listener {
             String response = plugin.getApiBase().user().getBalance(player.getName());
             ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
             if (responseResult.status == 200) {
-                plugin.getApiBase().user().userBalance.put(player.getUniqueId(), responseResult.data.get("balance"));
+                UserBalance UserBalance = new UserBalance(responseResult.data.get("paid_balance"),responseResult.data.get("virtual_balance"),responseResult.data.get("total_balance"));
+                plugin.getApiBase().user().userBalances.put(player.getUniqueId(), UserBalance);
             }
 
         }, 50, 2400);
@@ -51,11 +52,7 @@ public class PlayerJoinQuit implements Listener {
         Player player = event.getPlayer();
 
         //remove the player from the balanceMap for placeholder
-        //we run this only if use-placeholder is true;
-
-        plugin.getApiBase().user().userBalance.remove(player.getUniqueId());
-
-
+        plugin.getApiBase().user().userBalances.remove(player.getUniqueId());
         //cancel any task after player quit
         if (tasks.containsKey(player.getUniqueId())) {
             BukkitTask pendingTask = tasks.get(player.getUniqueId());

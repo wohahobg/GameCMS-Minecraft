@@ -33,7 +33,13 @@ public class ConfigFile {
         config = YamlConfiguration.loadConfiguration(file);
 
         if (!file.exists()) {
-            plugin.saveDefaultConfig();
+            config.set("api-key", "your_api_key");
+            config.set("sserver-key", "your_api_key");
+            config.set("commands-schedule", 1200);
+            config.set("broadcast-commands-message", true);
+            config.set("use-placeholders", false);
+            config.set("use-voting-plugin", false);
+            save();
         } else {
             //set api-key if does not exist
             if (!config.contains("api-key")) {

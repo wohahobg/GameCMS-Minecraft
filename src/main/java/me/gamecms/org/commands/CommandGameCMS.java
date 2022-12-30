@@ -35,22 +35,9 @@ public class CommandGameCMS implements CommandExecutor {
                     sender.sendMessage(noPermission());
                     return false;
                 }
-                System.out.println(Arrays.asList(plugin.getApiBase().user().userBalance)); // method 1
                 plugin.getConfigFile().initialize();
                 plugin.getWebStore().load();
-                sender.sendMessage(message("Конфигурационният файл е променена успешно."));
-                return true;
-            }
-
-            if (commandKey.equalsIgnoreCase("reload") || commandKey.equalsIgnoreCase("rl")) {
-                if (!sender.hasPermission("gamecms.admin")) {
-                    sender.sendMessage(noPermission());
-                    return false;
-                }
-                System.out.println(Arrays.asList(plugin.getApiBase().user().userBalance)); // method 1
-                plugin.getConfigFile().initialize();
-                plugin.getWebStore().load();
-                sender.sendMessage(message("Конфигурационният файл е променена успешно."));
+                sender.sendMessage(message("Конфигурационният файл е променен успешно."));
                 return true;
             }
 

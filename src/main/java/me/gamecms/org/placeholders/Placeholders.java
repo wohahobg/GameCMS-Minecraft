@@ -39,8 +39,14 @@ public class Placeholders extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, @NotNull String params)
     {
         if (plugin.getConfigFile().isPlaceholdersEnabled()) {
-            if (params.equals("user_balance")) {
-                return plugin.getApiBase().user().getUserBalance(player.getUniqueId());
+            if (params.equals("user_paid_balance")) {
+                return plugin.getApiBase().user().getPaidBalance(player.getUniqueId());
+            }
+            if (params.equals("user_virtual_balance")) {
+                return plugin.getApiBase().user().getVirtualBalance(player.getUniqueId());
+            }
+            if (params.equals("user_total_balance")) {
+                return plugin.getApiBase().user().getTotalBalance(player.getUniqueId());
             }
         }
         return null;

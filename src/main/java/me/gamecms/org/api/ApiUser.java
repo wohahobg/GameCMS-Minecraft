@@ -20,8 +20,7 @@ public class ApiUser {
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final String API_URL;
     private final GameCMS plugin;
-    public Map<UUID, String> userBalance = new HashMap<>();
-
+    public Map<UUID, UserBalance> userBalances = new HashMap<>();
 
     public ApiUser(ApiBase ApiBase) {
         plugin = ApiBase.plugin;
@@ -45,7 +44,7 @@ public class ApiUser {
     public String getBalance(String username) {
         try {
             String PARAMS = "username=" + username;
-            return this.sendRequest(PARAMS, "balance/check", "GET");
+            return this.sendRequest(PARAMS, "balance/get", "GET");
         } catch (Exception e) {
             e.printStackTrace();
             plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
@@ -66,13 +65,29 @@ public class ApiUser {
     }
 
 
-    public String getUserBalance(UUID playerUUID) {
-        if (this.userBalance.containsKey(playerUUID)) {
-            return this.userBalance.get(playerUUID);
+    public String getPaidBalance(UUID playerUUID) {
+        if (this.userBalances.containsKey(playerUUID)) {
+            UserBalance UserBalance = this.userBalances.get(playerUUID);
+            return UserBalance.getPaid();
         }
         return "0.00";
     }
 
+    public String getVirtualBalance(UUID playerUUID) {
+        if (this.userBalances.containsKey(playerUUID)) {
+            UserBalance UserBalance = this.userBalances.get(playerUUID);
+            return UserBalance.getVirtual();
+        }
+        return "0.00";
+    }
+
+    public String getTotalBalance(UUID playerUUID) {
+        if (this.userBalances.containsKey(playerUUID)) {
+            UserBalance UserBalance = this.userBalances.get(playerUUID);
+            return UserBalance.getTotal();
+        }
+        return "0.00";
+    }
 
     public String sendRequest(String PARAMS, String URL, String METHOD) throws IOException {
         String json;
