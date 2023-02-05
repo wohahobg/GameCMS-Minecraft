@@ -34,7 +34,7 @@ public class ConfigFile {
 
         if (!file.exists()) {
             config.set("api-key", "your_api_key");
-            config.set("sserver-key", "your_api_key");
+            config.set("server-key", "your_api_key");
             config.set("commands-schedule", 1200);
             config.set("broadcast-commands-message", true);
             config.set("use-placeholders", false);
