@@ -186,6 +186,7 @@ public class CommandGameCMS implements CommandExecutor {
                             String response = plugin.getApiBase().user().addBalance(args[1], balance);
                             Gson gson = new Gson();
                             ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
+
                             sender.sendMessage(message(responseResult.message));
                         } catch (Exception e) {
                             plugin.getLogger().info(e.getMessage());

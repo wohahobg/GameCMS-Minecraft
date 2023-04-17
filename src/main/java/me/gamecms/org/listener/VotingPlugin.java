@@ -24,7 +24,7 @@ public class VotingPlugin implements Listener {
             if (storageType == "MYSQL") {
                 MySQL mySql = votingPluginHooks.getMainClass().getMysql();
                 mySql.alterColumnType("gamecms_last_time_vote", "BIGINT DEFAULT '0'");
-                mySql.alterColumnType("gamecms_last_site_vote", "MEDIUMTEXT DEFAULT 'none'");
+                mySql.alterColumnType("gamecms_last_site_vote", "MEDIUMTEXT");
             }
         }, 50);
     }
