@@ -35,19 +35,13 @@ public class ConfigFile {
         if (!file.exists()) {
             config.set("api-key", "your_api_key");
             config.set("server-key", "your_api_key");
-            config.set("commands-schedule", 1200);
+            config.set("commands-scheduler", 1200);
             config.set("broadcast-commands-message", true);
             config.set("use-placeholders", false);
-            config.set("use-voting-plugin", false);
             save();
         } else {
-            //set api-key if does not exist
             if (!config.contains("api-key")) {
                 config.set("api-key", "your_api_key");
-                save();
-            }
-            if (!config.contains("commands-scheduler")) {
-                config.set("commands-scheduler", 1200);
                 save();
             }
             if (!config.contains("broadcast-commands-message")) {
