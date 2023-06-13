@@ -16,19 +16,19 @@ import com.google.gson.Gson;
 public class WebStore {
 
     private final GameCMS plugin;
-
     private BukkitTask task;
-
     private final Gson gson = new Gson();
     private final String API;
 
     public WebStore(GameCMS plugin) {
         this.plugin = plugin;
         API = plugin.API_URL + "/commands";
+        this.load();
+        this.start();
     }
 
     public void load() {
-        long minSchedule = DurationHelper.getTickDurationFromFormat("m", 1);
+        Integer minSchedule = DurationHelper.getTickDurationFromFormat("m", 1);
         if (plugin.getConfigFile().getCommandsScheduler() < minSchedule) {
             plugin.getConfigFile().setCommandsScheduler(minSchedule);
         }
@@ -39,8 +39,9 @@ public class WebStore {
         task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
 
             try {
-
-                plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+                if (plugin.getConfigFile().getLogFetchedCommands()) {
+                    plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+                }
 
                 ArrayList<CommandsHelper> commands = this.getCommands();
 
@@ -58,15 +59,16 @@ public class WebStore {
                 if (!commands.isEmpty()) {
 
                     try {
-                        this.completePayments();
+                        this.completeCommands();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                 }
 
-                plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
-
+                if (plugin.getConfigFile().getLogFetchedCommands()) {
+                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
+                }
             } catch (Exception e) {
                 plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
             }
@@ -86,7 +88,9 @@ public class WebStore {
     public void execute(CommandSender sender) {
 
         if (sender == null) {
-            plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+            if (plugin.getConfigFile().getLogFetchedCommands()) {
+                plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+            }
         }
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
 
@@ -101,19 +105,19 @@ public class WebStore {
 
                     execute(command);
                 }
-
                 if (!commands.isEmpty()) {
 
                     try {
-                        plugin.getWebStore().completePayments();
+                        plugin.getWebStore().completeCommands();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
 
                 if (sender == null) {
-                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
+                    if (plugin.getConfigFile().getLogFetchedCommands()) {
+                        plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
+                    }
                 } else {
                     sender.sendMessage("§aFetched due players §8(§e" + commands.size() + " found§8)§7.");
                 }
@@ -129,14 +133,6 @@ public class WebStore {
 
     public void execute(CommandsHelper commandsHandlers) {
 
-        if (plugin.getConfigFile().isBroadcastCommandsMessageEnabled()) {
-            if (commandsHandlers.order_message != null) {
-                if (!commandsHandlers.order_message.equals("")) {
-                    Bukkit.broadcastMessage(commandsHandlers.order_message.replace('&', '§'));
-                }
-            }
-        }
-
         Bukkit.getScheduler().runTask(plugin, () -> {
             commandsHandlers.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
 
@@ -149,7 +145,7 @@ public class WebStore {
 
         ArrayList<CommandsHelper> commands = new ArrayList<>();
 
-        String response = HTTPRequest.sendGET(API + "/queue/minecraft", plugin.getConfigFile().getServerKey());
+        String response = HTTPRequest.sendGET(API + "/queue/minecraft", plugin.getConfigFile().getServerApiKey());
 
         ApiRequestResponse responseResult = gson.fromJson(response, ApiRequestResponse.class);
         if (responseResult.status == 200) {
@@ -157,11 +153,10 @@ public class WebStore {
         }
 
         return commands;
-
     }
 
-    public void completePayments() throws Exception {
-        HTTPRequest.sendGET(API + "/complete", plugin.getConfigFile().getServerKey());
+    public void completeCommands() throws Exception {
+        HTTPRequest.sendGET(API + "/complete", plugin.getConfigFile().getServerApiKey());
     }
 
 }

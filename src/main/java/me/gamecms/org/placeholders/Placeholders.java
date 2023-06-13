@@ -40,13 +40,13 @@ public class Placeholders extends PlaceholderExpansion {
     {
         if (plugin.getConfigFile().isPlaceholdersEnabled()) {
             if (params.equals("user_paid_balance")) {
-                return plugin.getApiBase().user().getPaidBalance(player.getUniqueId());
+                return String.valueOf(plugin.getApiBase().user().getPaidBalance(player.getUniqueId()));
             }
             if (params.equals("user_virtual_balance")) {
-                return plugin.getApiBase().user().getVirtualBalance(player.getUniqueId());
+                return String.valueOf(plugin.getApiBase().user().getVirtualBalance(player.getUniqueId()));
             }
             if (params.equals("user_total_balance")) {
-                return plugin.getApiBase().user().getTotalBalance(player.getUniqueId());
+                return String.valueOf(plugin.getApiBase().user().getTotalBalance(player.getUniqueId()));
             }
         }
         return null;

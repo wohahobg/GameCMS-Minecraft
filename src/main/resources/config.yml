@@ -1,6 +1,8 @@
-api-key: "your-website-api-key"
-server-key: "your-server-api-key"
-commands-scheduler: "1200"
-broadcast-commands-message: "true"
-use-placeholders: "false"
-use-voting-plugin: "false"
+# This is your Website API KEY. You can get one from gamecms.app/profile/my-website
+website-api-key: your_api_key
+# This is your sever api key (where commands run) you can get one from Integrations > Servers
+server-api-key: test123
+# The commands scheduler
+commands-scheduler: 1200
+# Should we use placeholders?
+use-placeholders: true

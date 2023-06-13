@@ -2,7 +2,7 @@ package me.gamecms.org.utility;
 
 public class DurationHelper {
 	
-	public static Long getTickDurationFromFormat(String format, int duration) {
+	public static Integer getTickDurationFromFormat(String format, Integer duration) {
 		
 		long time;
 
@@ -41,7 +41,7 @@ public class DurationHelper {
 			return null;
 		}
 
-		return 20 * time;
+		return Math.toIntExact(20 * time);
 		
 	}
 	

@@ -2,15 +2,13 @@ package me.gamecms.org.commands;
 
 import com.google.gson.Gson;
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.api.ApiRequestResponseMain;
+import me.gamecms.org.api.responses.BasicRequestResponse;
 import me.gamecms.org.utility.DurationHelper;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Arrays;
 
 
 public class CommandGameCMS implements CommandExecutor {
@@ -35,9 +33,10 @@ public class CommandGameCMS implements CommandExecutor {
                     sender.sendMessage(noPermission());
                     return false;
                 }
-                plugin.getConfigFile().initialize();
+                // Reload the configuration
                 plugin.getWebStore().load();
-                sender.sendMessage(message("Конфигурационният файл е променен успешно."));
+                plugin.getConfigFile().getSettings().reload();
+                sender.sendMessage(message("Configuration file reloaded successfully."));
                 return true;
             }
 
@@ -46,20 +45,28 @@ public class CommandGameCMS implements CommandExecutor {
                     sender.sendMessage(noPermission());
                     return false;
                 }
+                // Execute a forced action
                 plugin.getWebStore().execute(sender);
                 return true;
             }
-            if (commandKey.equalsIgnoreCase("setServerKey")) {
+
+            if (commandKey.equalsIgnoreCase("test")) {
+                System.out.println(plugin.getConfigFile().getServerApiKey());
+                return true;
+            }
+
+            if (commandKey.equalsIgnoreCase("setServerApiKey")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
                 if (args.length == 1) {
-                    sender.sendMessage(message("Моля, въведете API ключа за този сървър."));
+                    sender.sendMessage(message("Please enter the API key for this server."));
                     return false;
                 }
-                plugin.getConfigFile().setServerKey(args[1]);
-                sender.sendMessage(message("Ключът на сървъра е променен успешно."));
+                // Set the server API key
+                plugin.getConfigFile().setServerApiKey(args[1]);
+                sender.sendMessage(message("Server API key has been successfully set."));
                 return true;
             }
 
@@ -69,72 +76,56 @@ public class CommandGameCMS implements CommandExecutor {
                     return false;
                 }
                 if (args.length == 1) {
-                    sender.sendMessage(message("Моля, въведете време за проверка на нови команди. Например 1200"));
+                    sender.sendMessage(message("Please enter the time interval in minutes for checking new commands. For example: 1200"));
                     return false;
                 }
                 try {
-                    long minSchedule = DurationHelper.getTickDurationFromFormat("m", 1);
-                    long schedule = Math.max(Long.parseLong(args[1]), 0);
-
-                    System.out.println(schedule);
+                    int minSchedule = DurationHelper.getTickDurationFromFormat("m", 1);
+                    int schedule = DurationHelper.getTickDurationFromFormat("m", Integer.parseInt(args[1]));
 
                     if (schedule < minSchedule) {
-                        sender.sendMessage(message("Времето за проверка не може да бъде по-малко от 1200."));
+                        sender.sendMessage(message("The check interval cannot be less than 1 minute."));
                         return false;
                     }
 
+                    // Set the commands scheduler
                     plugin.getConfigFile().setCommandsScheduler(schedule);
-                    sender.sendMessage(message("Времето се промени успешно."));
+                    sender.sendMessage(message("The commands scheduler has been updated successfully."));
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(message("Това не е валидно число. Моля, опитайте номер като 1200"));
+                    sender.sendMessage(message("The input is not a valid number. Please try again with a number like 1200."));
                 }
                 return true;
             }
 
-            if (commandKey.equalsIgnoreCase("setApiKey")) {
+            if (commandKey.equalsIgnoreCase("setWebsiteApiKey")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
                 if (args.length == 1) {
-                    sender.sendMessage(message("Моля, въведете API ключа на вашия уебсайт."));
+                    sender.sendMessage(message("Please enter your website API key."));
                     return false;
                 }
-                plugin.getConfigFile().setApiKey(args[1]);
-                sender.sendMessage(message("Ключът за API на уебсайта е променен успешно."));
-
+                // Set the website API key
+                plugin.getConfigFile().setWebsiteApiKey(args[1]);
+                sender.sendMessage(message("Website API key has been updated."));
                 return true;
             }
 
-            if (commandKey.equalsIgnoreCase("usePlaceholders")
-                    || commandKey.equalsIgnoreCase("usePapi")) {
+            if (commandKey.equalsIgnoreCase("usePlaceholders") || commandKey.equalsIgnoreCase("usePapi")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
-                if (plugin.getConfigFile().isPlaceholdersEnabled()){
-                    plugin.getConfigFile().setUsePlaceholders(false);
-                    sender.sendMessage(message("Изпозлването на Placeholders е деактивирано."));
-                }else{
-                    plugin.getConfigFile().setUsePlaceholders(true);
-                    sender.sendMessage(message("Изпозлването на Placeholders е активирано."));
-                }
-                return true;
-            }
-
-            if (commandKey.equalsIgnoreCase("useBroadcastMessages")
-                    || commandKey.equalsIgnoreCase("useBMC")) {
-                if (!sender.hasPermission("gamecms.admin")) {
-                    sender.sendMessage(noPermission());
+                if (plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") == null) {
+                    sender.sendMessage(message("You don't have PlaceholderAPI installed!"));
                     return false;
                 }
-                if (plugin.getConfigFile().isBroadcastCommandsMessageEnabled()){
-                    plugin.getConfigFile().setBroadcastCommandsMessage(false);
-                    sender.sendMessage(message("Изпозлването на Broadcast съобшенията е деактивирано."));
-                }else{
-                    plugin.getConfigFile().setBroadcastCommandsMessage(true);
-                    sender.sendMessage(message("Изпозлването на Broadcast съобшенията е активирано."));
-                }
+                // Toggle placeholders usage
+                boolean usePlaceholders = plugin.getConfigFile().isPlaceholdersEnabled();
+                plugin.getConfigFile().setUsePlaceholders(!usePlaceholders);
+                String status = usePlaceholders ? "disabled" : "enabled";
+                sender.sendMessage(message("Placeholders usage is now " + status + "!"));
                 return true;
             }
 
@@ -144,26 +135,22 @@ public class CommandGameCMS implements CommandExecutor {
                     return false;
                 }
                 if (args.length == 1) {
-                    sender.sendMessage(message("Моля въведете потребителско име."));
+                    sender.sendMessage(message("Please enter a username!"));
                     return false;
                 }
 
+                // Get player balance asynchronously
                 plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                     try {
                         String response = plugin.getApiBase().user().getBalance(args[1]);
                         Gson gson = new Gson();
-
-                        ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
-
+                        BasicRequestResponse responseResult = gson.fromJson(response, BasicRequestResponse.class);
                         sender.sendMessage(message(responseResult.message));
                     } catch (Exception e) {
                         plugin.getLogger().info(e.getMessage());
                     }
                 });
-
                 return true;
-
-
             }
 
             if (commandKey.equalsIgnoreCase("addBalance")) {
@@ -172,37 +159,36 @@ public class CommandGameCMS implements CommandExecutor {
                     return false;
                 }
                 if (args.length == 1) {
-                    sender.sendMessage(message("Моля въведете потребителско име."));
+                    sender.sendMessage(message("Please enter a username!"));
                     return false;
                 }
                 if (args.length == 2) {
-                    sender.sendMessage(message("Моля въведете сума която да се добави към баланса на " + args[1]));
+                    sender.sendMessage(message("Please enter an amount to be added to the balance of " + args[1]));
                     return false;
                 }
                 try {
                     double balance = Double.parseDouble(args[2]);
+                    // Add balance to player asynchronously
                     plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                         try {
                             String response = plugin.getApiBase().user().addBalance(args[1], balance);
                             Gson gson = new Gson();
-                            ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
-
+                            BasicRequestResponse responseResult = gson.fromJson(response, BasicRequestResponse.class);
                             sender.sendMessage(message(responseResult.message));
                         } catch (Exception e) {
                             plugin.getLogger().info(e.getMessage());
                         }
                     });
                 } catch (Exception e) {
-                    sender.sendMessage(message("Сумата трябва да бъде число. Пример; /gcms addbalance Wohaho 15.50"));
+                    sender.sendMessage(message("The amount must be a number. Example: /addbalance PlayerName 15.50"));
                     return false;
                 }
-
                 return true;
             }
 
             if (commandKey.equalsIgnoreCase("Verify")) {
-                if (!(sender instanceof Player)){
-                    sender.sendMessage(message("Тази команда може да се изпълнява единствено ако сте в сървъра."));
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(message("This command can only be executed in-game."));
                     return false;
                 }
 
@@ -211,15 +197,16 @@ public class CommandGameCMS implements CommandExecutor {
                     return false;
                 }
                 if (args.length == 1) {
-                    sender.sendMessage(message("Моля, въведете токена за потвърждение. Можете да генерирате такъв от нашия уебсайт в страницата на вашия профил."));
+                    sender.sendMessage(message("Please enter the verification token. You can generate one from your profile page on our website."));
                     return false;
                 }
+                // Verify player profile asynchronously
                 plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
                     try {
                         Player player = (Player) sender;
                         String response = plugin.getApiBase().user().verifyProfile(args[1], player);
                         Gson gson = new Gson();
-                        ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
+                        BasicRequestResponse responseResult = gson.fromJson(response, BasicRequestResponse.class);
                         sender.sendMessage(message(responseResult.message));
                     } catch (Exception e) {
                         plugin.getLogger().info(e.getMessage());
@@ -229,10 +216,8 @@ public class CommandGameCMS implements CommandExecutor {
             }
         }
 
-        sender.sendMessage(message("Find everything for this plugin here: &fhttps://docs.gamecms.org/24"));
-
+        sender.sendMessage(message("Find everything for this plugin here: " + ChatColor.WHITE + "https://docs.gamecms.org/24"));
         return true;
-
     }
 
     public String message(String message) {
@@ -240,7 +225,7 @@ public class CommandGameCMS implements CommandExecutor {
     }
 
     public String noPermission() {
-        return ChatColor.translateAlternateColorCodes('&', "&f&l[&9GameCMS&f&l] &3&lНямате разрешение за тази команда.");
+        return ChatColor.translateAlternateColorCodes('&', "&f&l[&9GameCMS&f&l] &3&lYou don't have permission!");
     }
 
 }

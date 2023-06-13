@@ -13,16 +13,8 @@ public class CommandsEvent extends Event {
 		this.commands = commands;
 	}
 
-	public CommandsHelper getCommands() {
-		return commands;
-	}
-
 	@Override
 	public HandlerList getHandlers() {
-		return handlerList;
-	}
-
-	public static HandlerList getHandlerList() {
 		return handlerList;
 	}
 }

@@ -9,33 +9,23 @@ public class CommandsHelper {
     public String id;
     public String username;
     public boolean must_be_online;
-    public String commands;
-    public String order_message;
+    public List<String> commands;
 
-    public CommandsHelper(String id, String username, boolean must_be_online, List<String> commands, String order_message) {
+    // Constructor
+    public CommandsHelper(String id, String username, boolean must_be_online, List<String> commands) {
         this.id = id;
         this.username = username;
         this.must_be_online = must_be_online;
-        //add commands in list as string
-        //example [say hello, say hello]
-        String var1 = "";
-        for (String command : commands) {
-            var1 += command + ",";
-        }
-        this.commands = "[" + var1 + "]";
-        this.order_message = order_message;
+        this.commands = commands;
     }
 
-
+    // Getter
     public List<String> getCommands() {
-
-        if (commands == null)
+        if (commands == null) {
             return Collections.emptyList();
-        commands = commands.replace("[", "");
-        commands = commands.replace("]", "");
-        commands = commands.replace("\"", "");
-        return Arrays.asList(commands.split("\\s*,\\s*"));
-
+        } else {
+            return commands;
+        }
     }
-
 }
+

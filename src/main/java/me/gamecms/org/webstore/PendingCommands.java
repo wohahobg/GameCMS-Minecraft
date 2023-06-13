@@ -17,106 +17,105 @@ import org.bukkit.event.Listener;
 
 public class PendingCommands implements Listener {
 
-	private GameCMS plugin;
+    private GameCMS plugin;
 
-	private File file;
-	private FileConfiguration config;
+    private File file;
+    private FileConfiguration fileConfiguration;
 
-	public PendingCommands(GameCMS plugin) {
-		this.plugin = plugin;
-	}
+    public PendingCommands(GameCMS plugin) {
+        this.plugin = plugin;
+    }
 
-	public void initialize() {
-		//TODO change pending_orders.yml to pending_commands.yml
-		file = new File(GameCMS.getInstance().getDataFolder(), "pending_orders.yml");
-		config = YamlConfiguration.loadConfiguration(file);
-	}
+    public void initialize() {
+        //TODO change pending_orders.yml to pending_commands.yml
+        file = new File(GameCMS.getInstance().getDataFolder(), "pending-commands.yml");
+        fileConfiguration = YamlConfiguration.loadConfiguration(file);
+    }
 
-	public void onPlayerJoin(Player player){
-		if (plugin.getPendingCommands().hasCommands(player.getName())) {
-			plugin.getPendingCommands().executeCommands(player.getName());
-		}
-	}
+    public void onPlayerJoin(Player player) {
+        if (plugin.getPendingCommands().hasCommands(player.getName())) {
+            plugin.getPendingCommands().executeCommands(player.getName());
+        }
+    }
 
-	public void saveCommand(String username, CommandsHelper command) {
+    public void saveCommand(String username, CommandsHelper command) {
 
-		config.set(username + "." + command.id + ".id", command.id);
-		config.set(username + "." + command.id + ".username", command.username);
-		config.set(username + "." + command.id + ".must_be_online", command.must_be_online);
-		config.set(username + "." + command.id + ".commands", command.getCommands());
-		config.set(username + "." + command.id + ".order_message", command.order_message);
+        String cleanUsername = username.trim();
 
-		save(file, config);
-	}
+        fileConfiguration.set(cleanUsername + "." + command.id + ".id", command.id);
+        fileConfiguration.set(cleanUsername + "." + command.id + ".username", command.username);
+        fileConfiguration.set(cleanUsername + "." + command.id + ".must_be_online", command.must_be_online);
+        fileConfiguration.set(cleanUsername + "." + command.id + ".commands", command.getCommands());
 
-	public void deleteOrder(String username) {
+        save(file, fileConfiguration);
+    }
 
-		for (String order : config.getConfigurationSection(username).getKeys(false)) {
-			config.set(username + "." + order + ".id", null);
-			config.set(username + "." + order + ".username", null);
-			config.set(username + "." + order + ".must_be_online", null);
-			config.set(username + "." + order + ".commands", null);
-			config.set(username + "." + order + ".order_message", null);
-			config.set(username + "." + order, null);
-		}
+    public void deleteCommands(String username) {
 
-		config.set(username, null);
+        for (String order : fileConfiguration.getConfigurationSection(username).getKeys(false)) {
+            fileConfiguration.set(username + "." + order + ".id", null);
+            fileConfiguration.set(username + "." + order + ".username", null);
+            fileConfiguration.set(username + "." + order + ".must_be_online", null);
+            fileConfiguration.set(username + "." + order + ".commands", null);
+            fileConfiguration.set(username + "." + order, null);
+        }
 
-		try {
-			config.save(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        fileConfiguration.set(username, null);
 
-	}
+        try {
+            fileConfiguration.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-	public boolean hasCommands(String username) {
-		return config.isConfigurationSection(username);
-	}
+    }
 
-	public void executeCommands(String username) {
+    public boolean hasCommands(String username) {
+        return fileConfiguration.isConfigurationSection(username);
+    }
+
+    public void executeCommands(String username) {
 
         Map<String, CommandsHelper> commandsMap = getUserCommands(username);
 
         commandsMap.values().forEach(command -> plugin.getWebStore().execute(command));
 
-		deleteOrder(username);
+        deleteCommands(username);
 
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	public Map<String, CommandsHelper> getUserCommands(String username) {
+    @SuppressWarnings("unchecked")
+    public Map<String, CommandsHelper> getUserCommands(String username) {
 
-		Map<String, CommandsHelper> commands = new HashMap<String, CommandsHelper>();
+        Map<String, CommandsHelper> commands = new HashMap<String, CommandsHelper>();
 
-		if (config.getString(username) == null) {
-			return commands;
-		}
+        if (fileConfiguration.getString(username) == null) {
+            return commands;
+        }
 
-		for (String command : config.getConfigurationSection(username).getKeys(false)) {
+        for (String command : fileConfiguration.getConfigurationSection(username).getKeys(false)) {
 
-			boolean must_be_online = config.getBoolean(username + "." + command + ".must_be_online");
-			List<String> userCommands = (List<String>) config.getList(username + "." + command + ".commands");
-			String order_message = config.getString(username + "." + command + ".order_message");
+            boolean must_be_online = fileConfiguration.getBoolean(username + "." + command + ".must_be_online");
+            List<String> userCommands = (List<String>) fileConfiguration.getList(username + "." + command + ".commands");
 
-			commands.put(command, new CommandsHelper(command, username, must_be_online, userCommands, order_message));
+            commands.put(command, new CommandsHelper(command, username, must_be_online, userCommands));
 
-		}
+        }
 
-		return commands;
+        return commands;
 
-	}
+    }
 
-	private void save(File file, FileConfiguration config) {
+    private void save(File file, FileConfiguration config) {
 
-		try {
-			Writer writer = new BufferedWriter( new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8")));
-			writer.write(config.saveToString());
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        try {
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), Charset.forName("UTF-8")));
+            writer.write(config.saveToString());
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
 }

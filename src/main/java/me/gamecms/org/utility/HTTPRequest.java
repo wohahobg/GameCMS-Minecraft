@@ -1,7 +1,7 @@
 package me.gamecms.org.utility;
 
 
-import me.gamecms.org.api.ApiRequestResponseMain;
+import me.gamecms.org.api.responses.BasicRequestResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class HTTPRequest {
         String line;
         StringBuilder responseContent = new StringBuilder();
         //simple add empty json status as null so we can check easy if the status is 200 or etc.
-        String result = ApiRequestResponseMain.bad_request_format;
+        String result = BasicRequestResponse.bad_request_format;
         int responseCode = connection.getResponseCode();
 
         //System.out.println("Status Code: " + responseCode);

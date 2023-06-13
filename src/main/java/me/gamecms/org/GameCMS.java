@@ -9,7 +9,6 @@ import me.gamecms.org.listener.VotingPlugin;
 import me.gamecms.org.webstore.PendingCommands;
 import me.gamecms.org.placeholders.Placeholders;
 import me.gamecms.org.webstore.WebStore;
-import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -34,7 +33,6 @@ public class GameCMS extends JavaPlugin{
     @Override
     public void onEnable() {
         configFile = new ConfigFile(this);
-        configFile.initialize();
 
         //load the api
         apiBase = new ApiBase(this);
@@ -57,8 +55,6 @@ public class GameCMS extends JavaPlugin{
         //load webstore tasks
         //se we can check simple every x times for new commands
         webStore = new WebStore(this);
-        webStore.load();
-        webStore.start();
 
         playerListener = new PlayerJoinQuit(this);
         //load event listener
@@ -66,7 +62,6 @@ public class GameCMS extends JavaPlugin{
         getCommand("gcms").setExecutor(new CommandGameCMS(this));
         getCommand("gcms").setTabCompleter(new CommandTabCompleter());
     }
-
 
     @Override
     public void onDisable() {
@@ -94,7 +89,4 @@ public class GameCMS extends JavaPlugin{
         return apiBase;
     }
 
-//    public PlaceholdersRegister getPlaceholders() {
-//        return placeholders;
-//    }
 }

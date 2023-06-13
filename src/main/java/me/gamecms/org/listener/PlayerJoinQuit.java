@@ -2,8 +2,8 @@ package me.gamecms.org.listener;
 
 import com.google.gson.Gson;
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.api.ApiRequestResponseMain;
-import me.gamecms.org.api.UserBalance;
+import me.gamecms.org.api.responses.BasicRequestResponse;
+import me.gamecms.org.api.responses.UserBalanceResponse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,18 +32,18 @@ public class PlayerJoinQuit implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        BukkitTask pendingTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        BukkitTask playerTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             plugin.getPendingCommands().onPlayerJoin(player);
             String response = plugin.getApiBase().user().getBalance(player.getName());
-            ApiRequestResponseMain responseResult = gson.fromJson(response, ApiRequestResponseMain.class);
+            BasicRequestResponse responseResult = gson.fromJson(response, BasicRequestResponse.class);
             if (responseResult.status == 200) {
-                UserBalance UserBalance = new UserBalance(responseResult.data.get("paid_balance"),responseResult.data.get("virtual_balance"),responseResult.data.get("total_balance"));
+                UserBalanceResponse UserBalance = new UserBalanceResponse(responseResult.data.get("paid_balance"),responseResult.data.get("virtual_balance"),responseResult.data.get("total_balance"));
                 plugin.getApiBase().user().userBalances.put(player.getUniqueId(), UserBalance);
             }
 
         }, 50, 2400);
 
-        tasks.put(player.getUniqueId(), pendingTask);
+        tasks.put(player.getUniqueId(), playerTask);
 
     }
 
@@ -69,6 +69,7 @@ public class PlayerJoinQuit implements Listener {
             for (BukkitTask task : tasks.values()) {
                 task.cancel();
             }
+            tasks.clear();
         }
     }
 
