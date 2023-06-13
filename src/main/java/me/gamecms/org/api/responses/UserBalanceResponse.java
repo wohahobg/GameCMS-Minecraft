@@ -1,12 +1,12 @@
-package me.gamecms.org.api;
+package me.gamecms.org.api.responses;
 
-public class UserBalance {
+public class UserBalanceResponse {
 
     String paid;
     String virtual;
     String total;
 
-    public UserBalance(String paid, String virtual, String total){
+    public UserBalanceResponse(String paid, String virtual, String total){
         this.paid = paid;
         this.virtual = virtual;
         this.total = total;
@@ -19,6 +19,7 @@ public class UserBalance {
     public String getVirtual(){
         return this.virtual;
     }
+
     public String getTotal(){
         return this.total;
     }

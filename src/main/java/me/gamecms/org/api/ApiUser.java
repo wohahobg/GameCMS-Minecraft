@@ -1,6 +1,7 @@
 package me.gamecms.org.api;
 
 import me.gamecms.org.GameCMS;
+import me.gamecms.org.api.responses.UserBalanceResponse;
 import me.gamecms.org.utility.HTTPRequest;
 import org.bukkit.entity.Player;
 
@@ -20,7 +21,7 @@ public class ApiUser {
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final String API_URL;
     private final GameCMS plugin;
-    public Map<UUID, UserBalance> userBalances = new HashMap<>();
+    public Map<UUID, UserBalanceResponse> userBalances = new HashMap<>();
 
     public ApiUser(ApiBase ApiBase) {
         plugin = ApiBase.plugin;
@@ -67,7 +68,7 @@ public class ApiUser {
 
     public String getPaidBalance(UUID playerUUID) {
         if (this.userBalances.containsKey(playerUUID)) {
-            UserBalance UserBalance = this.userBalances.get(playerUUID);
+            UserBalanceResponse UserBalance = this.userBalances.get(playerUUID);
             return UserBalance.getPaid();
         }
         return "0.00";
@@ -75,7 +76,7 @@ public class ApiUser {
 
     public String getVirtualBalance(UUID playerUUID) {
         if (this.userBalances.containsKey(playerUUID)) {
-            UserBalance UserBalance = this.userBalances.get(playerUUID);
+            UserBalanceResponse UserBalance = this.userBalances.get(playerUUID);
             return UserBalance.getVirtual();
         }
         return "0.00";
@@ -83,7 +84,7 @@ public class ApiUser {
 
     public String getTotalBalance(UUID playerUUID) {
         if (this.userBalances.containsKey(playerUUID)) {
-            UserBalance UserBalance = this.userBalances.get(playerUUID);
+            UserBalanceResponse UserBalance = this.userBalances.get(playerUUID);
             return UserBalance.getTotal();
         }
         return "0.00";
@@ -92,10 +93,10 @@ public class ApiUser {
     public String sendRequest(String PARAMS, String URL, String METHOD) throws IOException {
         String json;
         if (METHOD.equals("POST")) {
-            json = HTTPRequest.sendPost(API_URL + "/" + URL, PARAMS, plugin.getConfigFile().getApiKey());
+            json = HTTPRequest.sendPost(API_URL + "/" + URL, PARAMS, plugin.getConfigFile().getWebsiteApiKey());
         } else {
             URL = API_URL + "/" + URL + "?" + PARAMS;
-            json = HTTPRequest.sendGET(URL, plugin.getConfigFile().getApiKey());
+            json = HTTPRequest.sendGET(URL, plugin.getConfigFile().getWebsiteApiKey());
         }
         return json;
     }
