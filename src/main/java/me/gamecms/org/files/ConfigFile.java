@@ -20,7 +20,6 @@ public class ConfigFile {
                 .configurationData(PluginConfigProperties.class)
                 .useDefaultMigrationService()
                 .create();
-        System.out.println(settings.getProperty(PluginConfigProperties.WEBSITE_API_KEY));
     }
 
     public SettingsManager getSettings(){

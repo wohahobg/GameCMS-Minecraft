@@ -40,6 +40,17 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
 
+            if (commandKey.equalsIgnoreCase("reloadPendingFile")) {
+                if (!sender.hasPermission("gamecms.admin")) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+                plugin.getPendingCommands().initialize();
+                sender.sendMessage(message("Pending commands reloaded!"));
+                return true;
+            }
+
+
             if (commandKey.equalsIgnoreCase("force")) {
                 if (!sender.hasPermission("gamecms.admin")) {
                     sender.sendMessage(noPermission());
@@ -47,11 +58,6 @@ public class CommandGameCMS implements CommandExecutor {
                 }
                 // Execute a forced action
                 plugin.getWebStore().execute(sender);
-                return true;
-            }
-
-            if (commandKey.equalsIgnoreCase("test")) {
-                System.out.println(plugin.getConfigFile().getServerApiKey());
                 return true;
             }
 

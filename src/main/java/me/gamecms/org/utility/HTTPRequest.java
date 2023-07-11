@@ -60,8 +60,6 @@ public class HTTPRequest {
         String result = BasicRequestResponse.bad_request_format;
         int responseCode = connection.getResponseCode();
 
-        //System.out.println("Status Code: " + responseCode);
-
         if (responseCode == 200 || responseCode == 400 || responseCode == 404) {
             if (responseCode == 200) {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));

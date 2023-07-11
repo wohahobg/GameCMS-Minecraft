@@ -27,7 +27,6 @@ public class PendingCommands implements Listener {
     }
 
     public void initialize() {
-        //TODO change pending_orders.yml to pending_commands.yml
         file = new File(GameCMS.getInstance().getDataFolder(), "pending-commands.yml");
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
     }

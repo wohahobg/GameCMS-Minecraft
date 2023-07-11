@@ -22,7 +22,8 @@ public class CommandTabCompleter implements TabCompleter {
             "checkbalance",
             "useplaceholders",
             "usepapi",
-            "verify"
+            "verify",
+            "reloadPendingFile"
     };
 
     @Override
