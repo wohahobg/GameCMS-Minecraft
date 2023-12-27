@@ -3,7 +3,7 @@ name: GameCMS
 authors: [ Wohaho ]
 description: Plugin for the platform GameCMS.ORG
 website: gamecms.org
-version: 2.7.4
+version: 2.7.4a
 
 commands:
   gcms:
@@ -34,6 +34,9 @@ permissions:
     default: op
   gamecms.whitelist.cache:
     description: Allows players to clear whitelist cache.
+    default: op
+  gamecms.whitelist.maxips:
+    description: Allows players to set the maximum number of IP addresses allowed per whitelisted user.
     default: op
   gamecms.reload:
     description: Reload the configuration.

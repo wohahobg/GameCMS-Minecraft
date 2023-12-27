@@ -2,10 +2,11 @@ package me.gamecms.org.listener;
 
 import com.google.gson.Gson;
 import me.gamecms.org.GameCMS;
+import me.gamecms.org.MessageFormatter;
 import me.gamecms.org.api.responses.BasicRequestResponse;
 import me.gamecms.org.api.responses.UserBalanceResponse;
 import me.gamecms.org.entrys.WhitelistCacheEntry;
-import org.bukkit.ChatColor;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,10 +16,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class PlayerJoinQuit implements Listener {
 
@@ -35,21 +34,26 @@ public class PlayerJoinQuit implements Listener {
 
     @EventHandler
     public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
-
-        if (plugin.getConfigFile().isWhitelistEnabled()){
+        if (plugin.getConfigFile().isWhitelistEnabled()) {
             String playerAddress = event.getAddress().toString();
             String playerName = event.getName();
-            List<String> lines = plugin.getConfigFile().getWhitelistMessage();
-            String whitelistMessage = lines.stream()
-                    .map(line -> ChatColor.translateAlternateColorCodes('&', line))
-                    .collect(Collectors.joining("\n"));
+
 
             if (plugin.getConfigFile().getWhitelistedNamed().contains(playerName)) {
                 return;
             }
 
+            String whitelistMessage = MessageFormatter.formatMessage(plugin.getConfigFile().getWhitelistMessage());
+            String whiteListMaxIpLimitExceededMessage = MessageFormatter.formatMessage(plugin.getConfigFile().getMaxIpLimitExceededMessage());
+
             if (playerAddress.startsWith("/")) {
                 playerAddress = playerAddress.substring(1);
+            }
+
+            long joinByFromIp = plugin.getWhitelistCache().mappingCount();
+            if (plugin.getConfigFile().getWhitelistMaxIPs() <= joinByFromIp) {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, whiteListMaxIpLimitExceededMessage);
+                return;
             }
 
             // Check cache
@@ -70,12 +74,8 @@ public class PlayerJoinQuit implements Listener {
                 }
             } catch (Exception e) {
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Error checking whitelist status: " + e.getMessage());
-
             }
         }
-        
-
-
     }
 
     @EventHandler
@@ -121,10 +121,6 @@ public class PlayerJoinQuit implements Listener {
         }
     }
 
-    private boolean isCollectionMapNullOrEmpty(final Map<?, ?> m) {
-        return m == null || m.isEmpty();
-    }
-
     private Boolean getWhitelistStatusFromCache(String playerAddress) {
         WhitelistCacheEntry cacheEntry = plugin.getWhitelistCache().get(playerAddress);
 
@@ -136,7 +132,7 @@ public class PlayerJoinQuit implements Listener {
                 plugin.getWhitelistCache().remove(playerAddress);
             }
         }
-        return false;
+        return null;
     }
 
 
