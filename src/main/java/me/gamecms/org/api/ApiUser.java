@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 
 import java.io.*;
 import java.math.RoundingMode;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.text.DecimalFormat;
 
 import java.util.HashMap;
@@ -58,6 +60,18 @@ public class ApiUser {
             //setup REQUEST params. Without ? it is in sendRequest();
             String PARAMS = "token=" + token + "&username=" + player.getName() + "&uuid=" + player.getUniqueId();
             return this.sendRequest(PARAMS, "verify/minecraft", "POST");
+        } catch (Exception e) {
+            e.printStackTrace();
+            plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
+        }
+        return null;
+    }
+
+    public String isWhitelisted(String ipAddress){
+        try {
+            //setup REQUEST params. Without ? it is in sendRequest();
+            String PARAMS = "ip=" + ipAddress;
+            return this.sendRequest(PARAMS, "whitelist/ip", "GET");
         } catch (Exception e) {
             e.printStackTrace();
             plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");

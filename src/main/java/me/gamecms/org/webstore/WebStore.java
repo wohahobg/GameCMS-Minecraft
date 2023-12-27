@@ -2,6 +2,7 @@ package me.gamecms.org.webstore;
 
 
 import me.gamecms.org.GameCMS;
+import me.gamecms.org.entrys.WhitelistCacheEntry;
 import me.gamecms.org.utility.DurationHelper;
 import me.gamecms.org.utility.HTTPRequest;
 import org.bukkit.Bukkit;
@@ -9,6 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import com.google.gson.Gson;
@@ -35,46 +39,42 @@ public class WebStore {
     }
 
     public void start() {
-
         task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            if (plugin.getConfigFile().getLogFetchedCommands()) {
+                plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+            }
+            fetchAndExecuteCommands(null);
+        }, plugin.getConfigFile().getCommandsScheduler(), plugin.getConfigFile().getCommandsScheduler());
+    }
 
-            try {
-                if (plugin.getConfigFile().getLogFetchedCommands()) {
-                    plugin.getLogger().log(Level.INFO, "Fetching all due players...");
+    public void fetchAndExecuteCommands(CommandSender sender) {
+        try {
+            List<String> executedCommandIds = new ArrayList<>();
+            ArrayList<CommandsHelper> commands = plugin.getWebStore().getCommands();
+
+            for (CommandsHelper command : commands) {
+                if (command.must_be_online && Bukkit.getPlayer(command.username) == null) {
+                    continue;
                 }
-
-                ArrayList<CommandsHelper> commands = this.getCommands();
-
-                for (CommandsHelper command : commands) {
-
-                    if (command.must_be_online && Bukkit.getPlayer(command.username) == null) {
-                        plugin.getPendingCommands().saveCommand(command.username, command);
-                        continue;
-                    }
-
-                    execute(command);
-
-                }
-
-                if (!commands.isEmpty()) {
-
-                    try {
-                        this.completeCommands();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                if (plugin.getConfigFile().getLogFetchedCommands()) {
-                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
-                }
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
+                executeCommand(command);
+                executedCommandIds.add(command.id);
             }
 
-        }, plugin.getConfigFile().getCommandsScheduler(), plugin.getConfigFile().getCommandsScheduler());
+            if (!executedCommandIds.isEmpty()) {
+                completeCommands(executedCommandIds);
+            }
 
+            if (sender == null) {
+                if (plugin.getConfigFile().getLogFetchedCommands()) {
+                    plugin.getLogger().log(Level.INFO, "Fetched due players (" + executedCommandIds.size() + " found).");
+                }
+            } else {
+                sender.sendMessage("§aFetched due players §8(§e" + executedCommandIds.size() + " found§8)§7.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            plugin.getLogger().log(Level.WARNING, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
+        }
     }
 
     public void stop() {
@@ -85,53 +85,7 @@ public class WebStore {
 
     }
 
-    public void execute(CommandSender sender) {
-
-        if (sender == null) {
-            if (plugin.getConfigFile().getLogFetchedCommands()) {
-                plugin.getLogger().log(Level.INFO, "Fetching all due players...");
-            }
-        }
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
-
-            try {
-                ArrayList<CommandsHelper> commands = plugin.getWebStore().getCommands();
-
-                for (CommandsHelper command : commands) {
-                    if (command.must_be_online && Bukkit.getPlayer(command.username) == null) {
-                        plugin.getPendingCommands().saveCommand(command.username, command);
-                        continue;
-                    }
-
-                    execute(command);
-                }
-                if (!commands.isEmpty()) {
-
-                    try {
-                        plugin.getWebStore().completeCommands();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (sender == null) {
-                    if (plugin.getConfigFile().getLogFetchedCommands()) {
-                        plugin.getLogger().log(Level.INFO, "Fetched due players (" + commands.size() + " found).");
-                    }
-                } else {
-                    sender.sendMessage("§aFetched due players §8(§e" + commands.size() + " found§8)§7.");
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
-            }
-
-        });
-
-    }
-
-    public void execute(CommandsHelper commandsHandlers) {
+    public void executeCommand(CommandsHelper commandsHandlers) {
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             commandsHandlers.getCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command));
@@ -155,8 +109,14 @@ public class WebStore {
         return commands;
     }
 
-    public void completeCommands() throws Exception {
-        HTTPRequest.sendGET(API + "/complete", plugin.getConfigFile().getServerApiKey());
+    public void completeCommands(List<String> executedCommandIds) throws Exception {
+        Gson gson = new Gson();
+        System.out.println(executedCommandIds);
+        String jsonPayload = gson.toJson(executedCommandIds);
+        String params = "ids=" + jsonPayload;
+        System.out.println(params);
+        String apiKey = plugin.getConfigFile().getServerApiKey();
+        HTTPRequest.sendPost(API + "/complete", params, apiKey);
     }
 
 }

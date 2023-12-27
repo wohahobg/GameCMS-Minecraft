@@ -10,6 +10,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 
 public class CommandGameCMS implements CommandExecutor {
 
@@ -29,7 +31,7 @@ public class CommandGameCMS implements CommandExecutor {
             String commandKey = args[0];
 
             if (commandKey.equalsIgnoreCase("reload") || commandKey.equalsIgnoreCase("rl")) {
-                if (!sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.reload", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -40,29 +42,19 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
 
-            if (commandKey.equalsIgnoreCase("reloadPendingFile")) {
-                if (!sender.hasPermission("gamecms.admin")) {
-                    sender.sendMessage(noPermission());
-                    return false;
-                }
-                plugin.getPendingCommands().initialize();
-                sender.sendMessage(message("Pending commands reloaded!"));
-                return true;
-            }
-
 
             if (commandKey.equalsIgnoreCase("force")) {
-                if (!sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.force", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
                 // Execute a forced action
-                plugin.getWebStore().execute(sender);
+                plugin.getWebStore().fetchAndExecuteCommands(sender);
                 return true;
             }
 
             if (commandKey.equalsIgnoreCase("setServerApiKey")) {
-                if (!sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.api.key.server", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -77,7 +69,7 @@ public class CommandGameCMS implements CommandExecutor {
             }
 
             if (commandKey.equalsIgnoreCase("setScheduler")) {
-                if (!sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.setscheduler", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -104,7 +96,7 @@ public class CommandGameCMS implements CommandExecutor {
             }
 
             if (commandKey.equalsIgnoreCase("setWebsiteApiKey")) {
-                if (!sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.api.key.website", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -118,8 +110,8 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
 
-            if (commandKey.equalsIgnoreCase("usePlaceholders") || commandKey.equalsIgnoreCase("usePapi")) {
-                if (!sender.hasPermission("gamecms.admin")) {
+            if (commandKey.equalsIgnoreCase("placeholdersToggle") || commandKey.equalsIgnoreCase("usePapi")) {
+                if (!this.hasPermission("gamecms.placeholders.toggle", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -136,7 +128,7 @@ public class CommandGameCMS implements CommandExecutor {
             }
 
             if (commandKey.equalsIgnoreCase("getBalance") || commandKey.equalsIgnoreCase("checkBalance")) {
-                if (!sender.hasPermission("gamecms.checkplayerbalance") && !sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.balance.check", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -160,7 +152,7 @@ public class CommandGameCMS implements CommandExecutor {
             }
 
             if (commandKey.equalsIgnoreCase("addBalance")) {
-                if (!sender.hasPermission("gamecms.addbalance") && !sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.balance.add", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -220,18 +212,82 @@ public class CommandGameCMS implements CommandExecutor {
                 });
                 return true;
             }
+            if (commandKey.equalsIgnoreCase("whitelistAdd") || commandKey.equalsIgnoreCase("WhitelistRemove")) {
+                String playerName = args[0];
+                List<String> whitelist = plugin.getConfigFile().getWhitelistedNamed(); // Replace with actual method to get the whitelist
+
+                if (commandKey.equalsIgnoreCase("whitelistAdd")) {
+                    if (!this.hasPermission("gamecms.whitelist.add", sender)) {
+                        sender.sendMessage(noPermission());
+                        return false;
+                    }
+
+                    if (!whitelist.contains(playerName)) {
+                        whitelist.add(playerName);
+                        plugin.getConfigFile().saveWhitelist(whitelist);
+                        sender.sendMessage(this.message(playerName + " has been added to the whitelist."));
+                    } else {
+                        sender.sendMessage(this.message(playerName + " is already in the whitelist."));
+                    }
+                }
+
+                if (commandKey.equalsIgnoreCase("whitelistRemove")) {
+                    if (!this.hasPermission("gamecms.whitelist.remove", sender)) {
+                        sender.sendMessage(noPermission());
+                        return false;
+                    }
+                    if (whitelist.contains(playerName)) {
+                        whitelist.remove(playerName);
+                        plugin.getConfigFile().saveWhitelist(whitelist);
+                        sender.sendMessage(this.message(playerName + " has been removed from the whitelist."));
+                    } else {
+                        sender.sendMessage(this.message(playerName + " is not in the whitelist."));
+                    }
+                }
+
+                return true;
+            }
+
+            if (commandKey.equalsIgnoreCase("whitelistToggle")) {
+                if (!this.hasPermission("gamecms.whitelist.toggle", sender)) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+                // Toggle placeholders usage
+                boolean usewhitelist = plugin.getConfigFile().isPlaceholdersEnabled();
+                plugin.getConfigFile().setUsePlaceholders(!usewhitelist);
+                String status = usewhitelist ? "disabled" : "enabled";
+                sender.sendMessage(message("Whitelist usage is now " + status + "!"));
+                return true;
+            }
+
+            if (commandKey.equalsIgnoreCase("whitelistClearCache")) {
+                if (!this.hasPermission("gamecms.whitelist.cache", sender)) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+                plugin.getWhitelistCache().clear();
+                sender.sendMessage(message("Whitelist cache cleared!"));
+                return true;
+            }
+
         }
 
         sender.sendMessage(message("Find everything for this plugin here: " + ChatColor.WHITE + "https://docs.gamecms.org/24"));
         return true;
     }
 
-    public String message(String message) {
+    private String message(String message) {
         return ChatColor.translateAlternateColorCodes('&', "&f&l[&9GameCMS&f&l] &7&l" + message);
     }
 
-    public String noPermission() {
+    private String noPermission() {
         return ChatColor.translateAlternateColorCodes('&', "&f&l[&9GameCMS&f&l] &3&lYou don't have permission!");
+    }
+
+    private Boolean hasPermission(String permission, CommandSender sender) {
+        if (!sender.hasPermission(permission) || !sender.hasPermission("gamecms.admin")) return false;
+        return true;
     }
 
 }

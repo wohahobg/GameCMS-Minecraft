@@ -15,15 +15,17 @@ public class CommandTabCompleter implements TabCompleter {
     private static final String[] COMMANDS = {
             "reload",
             "force",
-            "setserverapikey",
-            "setscheduler",
-            "setwebsiteapikey",
-            "addbalance",
-            "checkbalance",
-            "useplaceholders",
-            "usepapi",
-            "verify",
-            "reloadPendingFile"
+            "setServerApiKey",
+            "setScheduler",
+            "setWebsiteApiKey",
+            "placeholdersToggle",
+            "getBalance",
+            "checkBalance",
+            "addBalance",
+            "Verify",
+            "whitelistAdd",
+            "whitelistRemove",
+            "whitelistClearCache"
     };
 
     @Override

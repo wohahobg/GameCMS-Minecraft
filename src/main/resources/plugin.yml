@@ -4,22 +4,52 @@ authors: [ Wohaho ]
 description: Plugin for the platform GameCMS.ORG
 website: gamecms.org
 version: 2.7.4
+
 commands:
-  gcms :
-    aliases:
-      - gamecms
-      - game-cms
+  gcms:
+    aliases: [gamecms, game-cms]
     description: Commands for GameCMS.ORG Plugin
+    usage: /gcms <command>
+    permission: gamecms.admin
+    permission-message: You don't have permission to use this command.
+
 permissions:
   gamecms.admin:
-    default: op
     description: Allow players to have access to all plugin commands.
-  gamecms.checkplayerbalance:
     default: op
+  gamecms.balance.check:
     description: Allow players to check others players balance on your website.
-  gamecms.addbalance:
     default: op
-    description: Allow players to add balance to spcefic player on your website.
-  gamecms.verify:
+  gamecms.balance.add:
+    description: Allow players to add balance to a specific player on your website.
     default: op
-    description: Allow user to verify thiers profiles.
+  gamecms.whitelist.toggle:
+    description: Allow players to manage the user whitelist.
+    default: op
+  gamecms.whitelist.add:
+    description: Adds a player to the whitelist.
+    default: op
+  gamecms.whitelist.remove:
+    description: Removes a player from the whitelist.
+    default: op
+  gamecms.whitelist.cache:
+    description: Allows players to clear whitelist cache.
+    default: op
+  gamecms.reload:
+    description: Reload the configuration.
+    default: op
+  gamecms.force:
+    description: Execute a forced action.
+    default: op
+  gamecms.api.key.server:
+    description: Set the server API key.
+    default: op
+  gamecms.api.key.website:
+    description: Set the website API key.
+    default: op
+  gamecms.setscheduler:
+    description: Set the commands scheduler.
+    default: op
+  gamecms.placeholders.toggle:
+    description: Toggle placeholders usage.
+    default: op

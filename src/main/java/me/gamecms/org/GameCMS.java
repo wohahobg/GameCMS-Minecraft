@@ -3,13 +3,16 @@ package me.gamecms.org;
 import me.gamecms.org.api.ApiBase;
 import me.gamecms.org.commands.CommandGameCMS;
 import me.gamecms.org.commands.CommandTabCompleter;
+import me.gamecms.org.entrys.WhitelistCacheEntry;
 import me.gamecms.org.files.ConfigFile;
 import me.gamecms.org.listener.PlayerJoinQuit;
 import me.gamecms.org.listener.VotingPlugin;
-import me.gamecms.org.webstore.PendingCommands;
 import me.gamecms.org.placeholders.Placeholders;
 import me.gamecms.org.webstore.WebStore;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 
 public class GameCMS extends JavaPlugin{
@@ -18,10 +21,12 @@ public class GameCMS extends JavaPlugin{
 
     private ConfigFile configFile;
     private ApiBase apiBase;
-    private PendingCommands pendingCommands;
     private WebStore webStore;
     private boolean placeholders;
     private PlayerJoinQuit playerListener;
+
+    private final ConcurrentHashMap<String, WhitelistCacheEntry> whitelistCache = new ConcurrentHashMap<>();
+    private final long CACHE_DURATION = TimeUnit.MINUTES.toMillis(2);
 
     public final String API_URL = "https://api.gamecms.org/v2";
 
@@ -34,28 +39,18 @@ public class GameCMS extends JavaPlugin{
     public void onEnable() {
         configFile = new ConfigFile(this);
 
-        //load the api
         apiBase = new ApiBase(this);
 
-        //load pending commands
-        pendingCommands = new PendingCommands(this);
-        pendingCommands.initialize();
-
         if (this.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
-            //register placeholder if PlaceholderAPI exist
            placeholders = new Placeholders(this).register();
         }
 
-        //register VotingPlugin event and add last voted time & site
         if (this.getServer().getPluginManager().getPlugin("VotingPlugin") != null){
             VotingPlugin votingPlugin = new VotingPlugin(this);
             getServer().getPluginManager().registerEvents(votingPlugin, this);
         }
 
-        //load webstore tasks
-        //se we can check simple every x times for new commands
         webStore = new WebStore(this);
-
         playerListener = new PlayerJoinQuit(this);
         //load event listener
         getServer().getPluginManager().registerEvents(playerListener, this);
@@ -77,10 +72,6 @@ public class GameCMS extends JavaPlugin{
         return configFile;
     }
 
-    public PendingCommands getPendingCommands() {
-        return pendingCommands;
-    }
-
     public WebStore getWebStore() {
         return webStore;
     }
@@ -89,4 +80,11 @@ public class GameCMS extends JavaPlugin{
         return apiBase;
     }
 
+    public ConcurrentHashMap<String, WhitelistCacheEntry> getWhitelistCache() {
+        return whitelistCache;
+    }
+
+    public long getCACHE_DURATION() {
+        return CACHE_DURATION;
+    }
 }

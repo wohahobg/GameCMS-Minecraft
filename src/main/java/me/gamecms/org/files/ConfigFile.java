@@ -3,11 +3,11 @@ package me.gamecms.org.files;
 import ch.jalu.configme.SettingsManager;
 
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.utility.DurationHelper;
 
 import ch.jalu.configme.SettingsManagerBuilder;
 
 import java.io.File;
+import java.util.List;
 
 
 public class ConfigFile {
@@ -66,4 +66,21 @@ public class ConfigFile {
     public boolean isPlaceholdersEnabled() {
         return settings.getProperty(PluginConfigProperties.USE_PLACEHOLDERS);
     }
+
+    public boolean isWhitelistEnabled() {
+        return settings.getProperty(PluginConfigProperties.USE_WHITELIST);
+    }
+
+    public List<String> getWhitelistMessage() {
+        return settings.getProperty(PluginConfigProperties.WHITELIST_MESSAGE);
+    }
+
+    public List<String> getWhitelistedNamed() {
+        return settings.getProperty(PluginConfigProperties.WHITELISTED_NAMES);
+    }
+
+    public void saveWhitelist(List list){
+        settings.setProperty(PluginConfigProperties.WHITELISTED_NAMES, list);
+    }
+
 }
