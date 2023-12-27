@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -213,8 +214,9 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
             if (commandKey.equalsIgnoreCase("whitelistAdd") || commandKey.equalsIgnoreCase("WhitelistRemove")) {
-                String playerName = args[0];
-                List<String> whitelist = plugin.getConfigFile().getWhitelistedNamed(); // Replace with actual method to get the whitelist
+                String playerName = args[1];
+                List<String> originalWhitelist = plugin.getConfigFile().getWhitelistedNamed();
+                List<String> whitelist = new ArrayList<>(originalWhitelist);
 
                 if (commandKey.equalsIgnoreCase("whitelistAdd")) {
                     if (!this.hasPermission("gamecms.whitelist.add", sender)) {
