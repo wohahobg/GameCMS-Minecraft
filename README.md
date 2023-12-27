@@ -1,4 +1,3 @@
 # GameCMS Minecraft Plugin
-Това е официалният плъгин за играта Minecraft за нашата платфрома
 
-Тук можете, единствено да намерите отвореният код на плъгина + всичките му версии. Повече информация отностно нашият плъгин можете да намерите тук; https://docs.gamecms.org/как-да-свържем-своят-minecraft-сървър-с-магазина
+Please read more here https://docs.gamecms.org/minecraft-java-version
