@@ -23,9 +23,11 @@ public class CommandTabCompleter implements TabCompleter {
             "checkBalance",
             "addBalance",
             "Verify",
+            "whitelistToggle",
             "whitelistAdd",
             "whitelistRemove",
-            "whitelistClearCache"
+            "whitelistClearCache",
+            "whitelistSetMaxIPs"
     };
 
     @Override

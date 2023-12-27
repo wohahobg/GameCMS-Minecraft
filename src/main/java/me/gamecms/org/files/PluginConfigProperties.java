@@ -50,6 +50,27 @@ public class PluginConfigProperties implements SettingsHolder {
             "&eTo join, you must be in a whitelist-enabled group.",
             "&aLog in at yourwebsite.com with this IP."
     ));
+
+    @Comment({
+            "Defines the maximum number of IP addresses each user can have whitelisted.",
+            "This setting helps control access by limiting the number of IPs per user in whitelisted groups.",
+            "Set this to a specific number to restrict the number of IPs per user. For example, '1' means a user can only have one IP address whitelisted.",
+            "Increasing this number allows users more flexibility in accessing the server from different locations."
+    })
+    public static final Property<Integer> MAX_IPS_PER_WHITELISTED_USER = newProperty("max-ips-per-whitelisted-user", 1);
+
+    @Comment({
+            "Customize the message sent to players who exceed the maximum IP address limit.",
+            "This message will be displayed to players who try to join the server from more",
+            "IP addresses than allowed by their group's whitelist settings.",
+            "Provide clear instructions or information on how to resolve this issue."
+    })
+    public static final Property<List<String>> MAX_IP_LIMIT_EXCEEDED_MESSAGE = newListProperty("max-ip-limit-exceeded-message", Arrays.asList(
+            "&cAccess Denied!",
+            "&eYour IP address limit has been exceeded.",
+            "&aPlease contact support or visit yourwebsite.com for assistance."
+    ));
+
     @Comment({
             "List of player names that are explicitly whitelisted.",
             "Players in this list will be allowed to join regardless of other whitelist settings."

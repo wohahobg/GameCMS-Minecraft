@@ -122,7 +122,7 @@ public class CommandGameCMS implements CommandExecutor {
                 }
                 // Toggle placeholders usage
                 boolean usePlaceholders = plugin.getConfigFile().isPlaceholdersEnabled();
-                plugin.getConfigFile().setUsePlaceholders(!usePlaceholders);
+                plugin.getConfigFile().placeholdersToggle(!usePlaceholders);
                 String status = usePlaceholders ? "disabled" : "enabled";
                 sender.sendMessage(message("Placeholders usage is now " + status + "!"));
                 return true;
@@ -250,6 +250,33 @@ public class CommandGameCMS implements CommandExecutor {
                 return true;
             }
 
+            if (commandKey.equalsIgnoreCase("whitelistSetMaxIPs")) {
+                if (!this.hasPermission("gamecms.whitelist.maxips", sender)) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+
+                try {
+                    int maxIps = Integer.parseInt(args[1]);
+                    plugin.getConfigFile().setMaxWhitelistIps(maxIps);
+                    sender.sendMessage(message("Max IPs per user set to " + maxIps + "."));
+                    return true;
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(message("Invalid number format. Please enter a valid integer for the maximum IP addresses."));
+                    return false;
+                }
+            }
+
+            if (commandKey.equalsIgnoreCase("whitelistClearCache")) {
+                if (!this.hasPermission("gamecms.whitelist.cache", sender)) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+                plugin.getWhitelistCache().clear();
+                sender.sendMessage(message("Whitelist cache cleared!"));
+                return true;
+            }
+
             if (commandKey.equalsIgnoreCase("whitelistToggle")) {
                 if (!this.hasPermission("gamecms.whitelist.toggle", sender)) {
                     sender.sendMessage(noPermission());
@@ -257,7 +284,7 @@ public class CommandGameCMS implements CommandExecutor {
                 }
                 // Toggle placeholders usage
                 boolean usewhitelist = plugin.getConfigFile().isPlaceholdersEnabled();
-                plugin.getConfigFile().setUsePlaceholders(!usewhitelist);
+                plugin.getConfigFile().whitelistToggle(!usewhitelist);
                 String status = usewhitelist ? "disabled" : "enabled";
                 sender.sendMessage(message("Whitelist usage is now " + status + "!"));
                 return true;

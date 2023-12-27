@@ -13,7 +13,9 @@ log-fetched-commands: true
 # If true, the plugin will check if players belong to a group on the website that has the whitelist option enabled.
 # Players in groups without the whitelist option enabled, or players not in any group, will not be allowed to join.
 # Set to false to allow all players to join the server, regardless of their group's whitelist status on the website.
-use-whitelist: true
+use-whitelist: false
+
+max-ips-per-whitelisted-user: false
 # Customize the message sent to players who are not allowed to join.
 # This message will be displayed to players who try to join the server but
 # are not logged into the website with the same IP address, or their group does not have whitelist permissions.

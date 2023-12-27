@@ -22,7 +22,7 @@ public class ConfigFile {
                 .create();
     }
 
-    public SettingsManager getSettings(){
+    public SettingsManager getSettings() {
         return settings;
     }
 
@@ -54,17 +54,32 @@ public class ConfigFile {
         return settings.getProperty(PluginConfigProperties.COMMANDS_SCHEDULER);
     }
 
-    public final boolean getLogFetchedCommands(){
+    public final boolean getLogFetchedCommands() {
         return settings.getProperty(PluginConfigProperties.LOG_FETCHED_COMMANDS);
     }
 
-    public void setUsePlaceholders(boolean use) {
+    public void placeholdersToggle(boolean use) {
         settings.setProperty(PluginConfigProperties.USE_PLACEHOLDERS, use);
         settings.save();
     }
 
     public boolean isPlaceholdersEnabled() {
         return settings.getProperty(PluginConfigProperties.USE_PLACEHOLDERS);
+    }
+
+    public void whitelistToggle(boolean use) {
+        settings.setProperty(PluginConfigProperties.USE_WHITELIST, use);
+        settings.save();
+    }
+
+    public void saveWhitelist(List list) {
+        settings.setProperty(PluginConfigProperties.WHITELISTED_NAMES, list);
+        settings.save();
+    }
+
+    public void setMaxWhitelistIps(Integer integer){
+        settings.setProperty(PluginConfigProperties.MAX_IPS_PER_WHITELISTED_USER, integer);
+        settings.save();
     }
 
     public boolean isWhitelistEnabled() {
@@ -79,8 +94,13 @@ public class ConfigFile {
         return settings.getProperty(PluginConfigProperties.WHITELISTED_NAMES);
     }
 
-    public void saveWhitelist(List list){
-        settings.setProperty(PluginConfigProperties.WHITELISTED_NAMES, list);
+    public List<String> getMaxIpLimitExceededMessage() {
+        return settings.getProperty(PluginConfigProperties.MAX_IP_LIMIT_EXCEEDED_MESSAGE);
     }
+
+    public Integer getWhitelistMaxIPs() {
+        return settings.getProperty(PluginConfigProperties.MAX_IPS_PER_WHITELISTED_USER);
+    }
+
 
 }
