@@ -114,7 +114,6 @@ public class WebStore {
         System.out.println(executedCommandIds);
         String jsonPayload = gson.toJson(executedCommandIds);
         String params = "ids=" + jsonPayload;
-        System.out.println(params);
         String apiKey = plugin.getConfigFile().getServerApiKey();
         HTTPRequest.sendPost(API + "/complete", params, apiKey);
     }
