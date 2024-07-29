@@ -1,31 +1,15 @@
 # API key for your website. You can obtain it from gamecms.app/profile/my-website
-website-api-key: a951ae8bf4daddc446dafd6d326f9dbff13ebf27f8b1504abe6aeab707f46ba9
+website-api-key: none
+
 # API key for your server (where commands run). You can obtain it from Integrations > Servers
-server-api-key: 84120f739845b1df919b0856afe048e82abebc60aa15de99fab6234be3c8a6a7
+server-api-key: none
+
 # The interval (in ticks) for checking new commands to execute. 20 ticks = 1 second
 commands-scheduler: 1200
+
 # Specify whether to use placeholders provided by PlaceholderAPI.
 # Note: PlaceholderAPI plugin must be installed for placeholders to work.
 use-placeholders: false
+
 # Log message for fetched commands
 log-fetched-commands: true
-# Enable or disable the use of the whitelist feature based on user groups from the website.
-# If true, the plugin will check if players belong to a group on the website that has the whitelist option enabled.
-# Players in groups without the whitelist option enabled, or players not in any group, will not be allowed to join.
-# Set to false to allow all players to join the server, regardless of their group's whitelist status on the website.
-use-whitelist: false
-
-max-ips-per-whitelisted-user: false
-# Customize the message sent to players who are not allowed to join.
-# This message will be displayed to players who try to join the server but
-# are not logged into the website with the same IP address, or their group does not have whitelist permissions.
-# Provide clear instructions on how they can meet the whitelist criteria.
-whitelist-message:
-  - '&cAccess denied.'
-  - '&eTo join, you must be in a whitelist-enabled group.'
-  - '&a&lLog in at yourwebsite.com with this IP.'
-# List of player names that are explicitly whitelisted.
-# Players in this list will be allowed to join regardless of other whitelist settings.
-whitelisted-names:
-  - Notch
-  - Wohaho

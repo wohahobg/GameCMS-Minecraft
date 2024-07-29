@@ -2,7 +2,6 @@ package me.gamecms.org.webstore;
 
 
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.entrys.WhitelistCacheEntry;
 import me.gamecms.org.utility.DurationHelper;
 import me.gamecms.org.utility.HTTPRequest;
 import org.bukkit.Bukkit;
@@ -100,8 +99,8 @@ public class WebStore {
         ArrayList<CommandsHelper> commands = new ArrayList<>();
 
         String response = HTTPRequest.sendGET(API + "/queue/minecraft", plugin.getConfigFile().getServerApiKey());
-
         ApiRequestResponse responseResult = gson.fromJson(response, ApiRequestResponse.class);
+
         if (responseResult.status == 200) {
             commands = (ArrayList<CommandsHelper>) responseResult.data;
         }
@@ -111,7 +110,6 @@ public class WebStore {
 
     public void completeCommands(List<String> executedCommandIds) throws Exception {
         Gson gson = new Gson();
-        System.out.println(executedCommandIds);
         String jsonPayload = gson.toJson(executedCommandIds);
         String params = "ids=" + jsonPayload;
         String apiKey = plugin.getConfigFile().getServerApiKey();

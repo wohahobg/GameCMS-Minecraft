@@ -35,8 +35,8 @@ public class ApiUser {
         try {
             df.setRoundingMode(RoundingMode.UP);
             //setup REQUEST params. Without ? it is in sendRequest();
-            String PARAMS = "username=" + username + "&balance=" + df.format(amount);
-            return this.sendRequest(PARAMS, "balance/add", "POST");
+            String PARAMS = "balance=" + df.format(amount);
+            return this.sendRequest(PARAMS, "balance/add?username=" + username, "POST");
         } catch (Exception e) {
             e.printStackTrace();
             plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
@@ -66,19 +66,6 @@ public class ApiUser {
         }
         return null;
     }
-
-    public String isWhitelisted(String ipAddress){
-        try {
-            //setup REQUEST params. Without ? it is in sendRequest();
-            String PARAMS = "ip=" + ipAddress;
-            return this.sendRequest(PARAMS, "whitelist/ip", "GET");
-        } catch (Exception e) {
-            e.printStackTrace();
-            plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
-        }
-        return null;
-    }
-
 
     public String getPaidBalance(UUID playerUUID) {
         if (this.userBalances.containsKey(playerUUID)) {

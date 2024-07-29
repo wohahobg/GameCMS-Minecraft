@@ -67,40 +67,7 @@ public class ConfigFile {
         return settings.getProperty(PluginConfigProperties.USE_PLACEHOLDERS);
     }
 
-    public void whitelistToggle(boolean use) {
-        settings.setProperty(PluginConfigProperties.USE_WHITELIST, use);
-        settings.save();
+    public int getHttpPort() {
+        return settings.getProperty(PluginConfigProperties.HTTP_PORT);
     }
-
-    public void saveWhitelist(List list) {
-        settings.setProperty(PluginConfigProperties.WHITELISTED_NAMES, list);
-        settings.save();
-    }
-
-    public void setMaxWhitelistIps(Integer integer){
-        settings.setProperty(PluginConfigProperties.MAX_IPS_PER_WHITELISTED_USER, integer);
-        settings.save();
-    }
-
-    public boolean isWhitelistEnabled() {
-        return settings.getProperty(PluginConfigProperties.USE_WHITELIST);
-    }
-
-    public List<String> getWhitelistMessage() {
-        return settings.getProperty(PluginConfigProperties.WHITELIST_MESSAGE);
-    }
-
-    public List<String> getWhitelistedNamed() {
-        return settings.getProperty(PluginConfigProperties.WHITELISTED_NAMES);
-    }
-
-    public List<String> getMaxIpLimitExceededMessage() {
-        return settings.getProperty(PluginConfigProperties.MAX_IP_LIMIT_EXCEEDED_MESSAGE);
-    }
-
-    public Integer getWhitelistMaxIPs() {
-        return settings.getProperty(PluginConfigProperties.MAX_IPS_PER_WHITELISTED_USER);
-    }
-
-
 }

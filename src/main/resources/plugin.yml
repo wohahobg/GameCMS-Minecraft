@@ -23,21 +23,6 @@ permissions:
   gamecms.balance.add:
     description: Allow players to add balance to a specific player on your website.
     default: op
-  gamecms.whitelist.toggle:
-    description: Allow players to manage the user whitelist.
-    default: op
-  gamecms.whitelist.add:
-    description: Adds a player to the whitelist.
-    default: op
-  gamecms.whitelist.remove:
-    description: Removes a player from the whitelist.
-    default: op
-  gamecms.whitelist.cache:
-    description: Allows players to clear whitelist cache.
-    default: op
-  gamecms.whitelist.maxips:
-    description: Allows players to set the maximum number of IP addresses allowed per whitelisted user.
-    default: op
   gamecms.reload:
     description: Reload the configuration.
     default: op

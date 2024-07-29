@@ -2,15 +2,12 @@ package me.gamecms.org.listener;
 
 import com.google.gson.Gson;
 import me.gamecms.org.GameCMS;
-import me.gamecms.org.MessageFormatter;
 import me.gamecms.org.api.responses.BasicRequestResponse;
 import me.gamecms.org.api.responses.UserBalanceResponse;
-import me.gamecms.org.entrys.WhitelistCacheEntry;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitTask;
@@ -30,52 +27,6 @@ public class PlayerJoinQuit implements Listener {
     public PlayerJoinQuit(GameCMS plugin) {
         this.plugin = plugin;
         tasks = new HashMap<>();
-    }
-
-    @EventHandler
-    public void onPlayerLogin(AsyncPlayerPreLoginEvent event) {
-        if (plugin.getConfigFile().isWhitelistEnabled()) {
-            String playerAddress = event.getAddress().toString();
-            String playerName = event.getName();
-
-
-            if (plugin.getConfigFile().getWhitelistedNamed().contains(playerName)) {
-                return;
-            }
-
-            String whitelistMessage = MessageFormatter.formatMessage(plugin.getConfigFile().getWhitelistMessage());
-            String whiteListMaxIpLimitExceededMessage = MessageFormatter.formatMessage(plugin.getConfigFile().getMaxIpLimitExceededMessage());
-
-            if (playerAddress.startsWith("/")) {
-                playerAddress = playerAddress.substring(1);
-            }
-
-            long joinByFromIp = plugin.getWhitelistCache().mappingCount();
-            if (plugin.getConfigFile().getWhitelistMaxIPs() <= joinByFromIp) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, whiteListMaxIpLimitExceededMessage);
-                return;
-            }
-
-            // Check cache
-            Boolean isWhitelisted = getWhitelistStatusFromCache(playerAddress);
-            if (isWhitelisted != null) {
-                if (!isWhitelisted) {
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, whitelistMessage);
-                }
-                return;
-            }
-
-            try {
-                String response = plugin.getApiBase().user().isWhitelisted(playerAddress);
-                Gson gson = new Gson();
-                BasicRequestResponse responseResult = gson.fromJson(response, BasicRequestResponse.class);
-                if (responseResult.status != 200) {
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, whitelistMessage);
-                }
-            } catch (Exception e) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Error checking whitelist status: " + e.getMessage());
-            }
-        }
     }
 
     @EventHandler
@@ -120,20 +71,5 @@ public class PlayerJoinQuit implements Listener {
             tasks.clear();
         }
     }
-
-    private Boolean getWhitelistStatusFromCache(String playerAddress) {
-        WhitelistCacheEntry cacheEntry = plugin.getWhitelistCache().get(playerAddress);
-
-        if (cacheEntry != null) {
-            long currentTime = System.currentTimeMillis();
-            if ((currentTime - cacheEntry.getTimestamp()) < plugin.getCACHE_DURATION()) {
-                return cacheEntry.isWhitelisted();
-            } else {
-                plugin.getWhitelistCache().remove(playerAddress);
-            }
-        }
-        return null;
-    }
-
 
 }
