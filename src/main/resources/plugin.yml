@@ -3,14 +3,12 @@ name: GameCMS
 authors: [ Wohaho ]
 description: Plugin for the platform GameCMS.ORG
 website: gamecms.org
-version: 2.7.4a
+version: 2.7.6
 
 commands:
   gcms:
     aliases: [gamecms, game-cms]
     description: Commands for GameCMS.ORG Plugin
-    usage: /gcms <command>
-    permission: gamecms.admin
     permission-message: You don't have permission to use this command.
 
 permissions:
@@ -40,4 +38,7 @@ permissions:
     default: op
   gamecms.placeholders.toggle:
     description: Toggle placeholders usage.
+    default: op
+  gamecms.verify:
+    description: Allow users to verifying their minecraft profiles with the website.
     default: op

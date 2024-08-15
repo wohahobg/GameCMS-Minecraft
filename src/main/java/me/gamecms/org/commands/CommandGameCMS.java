@@ -191,7 +191,7 @@ public class CommandGameCMS implements CommandExecutor {
                     return false;
                 }
 
-                if (!sender.hasPermission("gamecms.verify") && !sender.hasPermission("gamecms.admin")) {
+                if (!this.hasPermission("gamecms.verify", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -230,8 +230,9 @@ public class CommandGameCMS implements CommandExecutor {
     }
 
     private Boolean hasPermission(String permission, CommandSender sender) {
-        if (!sender.hasPermission(permission) || !sender.hasPermission("gamecms.admin")) return false;
-        return true;
+        if (sender.hasPermission("gamecms.admin")) return true;
+        if (sender.hasPermission(permission)) return true;
+        return false;
     }
 
 }

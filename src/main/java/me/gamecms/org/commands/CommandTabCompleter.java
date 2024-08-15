@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandTabCompleter implements TabCompleter {
 
@@ -27,11 +28,11 @@ public class CommandTabCompleter implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        //create new array
+        List<String> lowerCaseCommands = Arrays.stream(COMMANDS)
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
         final List<String> completions = new ArrayList<>();
-        //copy matches of first argument from list (ex: if first arg is 'm' will return just 'minecraft')
-        StringUtil.copyPartialMatches(args[0], Arrays.asList(COMMANDS), completions);
-        //sort the list
+        StringUtil.copyPartialMatches(args[0].toLowerCase(), lowerCaseCommands, completions);
         Collections.sort(completions);
         return completions;
     }
