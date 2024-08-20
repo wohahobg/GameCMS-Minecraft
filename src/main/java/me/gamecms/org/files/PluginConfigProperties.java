@@ -27,8 +27,8 @@ public class PluginConfigProperties implements SettingsHolder {
     @Comment("Log message for fetched commands")
     public static final Property<Boolean> LOG_FETCHED_COMMANDS = newProperty("log-fetched-commands", true);
 
-    @Comment("HTTP port for accepting requests from GameCMS.ORG. This port is used for retrieving player information and executing server commands.")
-    public static final Property<Integer> HTTP_PORT = newProperty("http-port", 0);
+//    @Comment("HTTP port for accepting requests from GameCMS.ORG. This port is used for retrieving player information and executing server commands.")
+//    public static final Property<Integer> HTTP_PORT = newProperty("http-port", 0);
 
 }
 
