@@ -1,14 +1,9 @@
 package me.gamecms.org.api;
 
-import me.gamecms.org.GameCMS;
 import me.gamecms.org.api.responses.UserBalanceResponse;
-import me.gamecms.org.utility.HTTPRequest;
 import org.bukkit.entity.Player;
 
-import java.io.*;
 import java.math.RoundingMode;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.text.DecimalFormat;
 
 import java.util.HashMap;
@@ -22,12 +17,13 @@ public class ApiUser {
 
     private final DecimalFormat df = new DecimalFormat("0.00");
     private final String API_URL;
-    private final GameCMS plugin;
+
+    private final ApiBase apiBase;
     public Map<UUID, UserBalanceResponse> userBalances = new HashMap<>();
 
     public ApiUser(ApiBase ApiBase) {
-        plugin = ApiBase.plugin;
-        API_URL = plugin.API_URL + "/websites/user";
+        apiBase = ApiBase;
+        API_URL = apiBase.plugin.API_URL + "/websites/user";
     }
 
 
@@ -36,10 +32,10 @@ public class ApiUser {
             df.setRoundingMode(RoundingMode.UP);
             //setup REQUEST params. Without ? it is in sendRequest();
             String PARAMS = "balance=" + df.format(amount);
-            return this.sendRequest(PARAMS, "balance/add?username=" + username, "POST");
+            return apiBase.sendWebsiteApiRequest(PARAMS, API_URL + "/balance/add?username=" + username, "POST");
         } catch (Exception e) {
             e.printStackTrace();
-            plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
+            apiBase.plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
         }
         return null;
     }
@@ -47,10 +43,10 @@ public class ApiUser {
     public String getBalance(String username) {
         try {
             String PARAMS = "username=" + username;
-            return this.sendRequest(PARAMS, "balance/get", "GET");
+            return apiBase.sendWebsiteApiRequest(PARAMS, API_URL + "/balance/get", "GET");
         } catch (Exception e) {
             e.printStackTrace();
-            plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
+            apiBase.plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
         }
         return null;
     }
@@ -59,10 +55,10 @@ public class ApiUser {
         try {
             //setup REQUEST params. Without ? it is in sendRequest();
             String PARAMS = "token=" + token + "&username=" + player.getName() + "&uuid=" + player.getUniqueId();
-            return this.sendRequest(PARAMS, "verify/minecraft", "POST");
+            return apiBase.sendWebsiteApiRequest(PARAMS, API_URL + "/verify/minecraft", "POST");
         } catch (Exception e) {
             e.printStackTrace();
-            plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
+            apiBase.plugin.getLogger().log(Level.INFO, "GameCMS seems to be offline right now. The data has been saved and will be executed soon.");
         }
         return null;
     }
@@ -90,17 +86,5 @@ public class ApiUser {
         }
         return "0.00";
     }
-
-    public String sendRequest(String PARAMS, String URL, String METHOD) throws IOException {
-        String json;
-        if (METHOD.equals("POST")) {
-            json = HTTPRequest.sendPost(API_URL + "/" + URL, PARAMS, plugin.getConfigFile().getWebsiteApiKey());
-        } else {
-            URL = API_URL + "/" + URL + "?" + PARAMS;
-            json = HTTPRequest.sendGET(URL, plugin.getConfigFile().getWebsiteApiKey());
-        }
-        return json;
-    }
-
 
 }

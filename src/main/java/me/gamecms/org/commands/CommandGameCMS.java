@@ -5,13 +5,16 @@ import me.gamecms.org.GameCMS;
 import me.gamecms.org.api.responses.BasicRequestResponse;
 import me.gamecms.org.utility.DurationHelper;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class CommandGameCMS implements CommandExecutor {
@@ -44,8 +47,8 @@ public class CommandGameCMS implements CommandExecutor {
             }
 
 
-            if (commandKey.equalsIgnoreCase("force")) {
-                if (!this.hasPermission("gamecms.force", sender)) {
+            if (commandKey.equalsIgnoreCase("store-force")) {
+                if (!this.hasPermission("gamecms.store.force", sender)) {
                     sender.sendMessage(noPermission());
                     return false;
                 }
@@ -59,14 +62,7 @@ public class CommandGameCMS implements CommandExecutor {
                     sender.sendMessage(noPermission());
                     return false;
                 }
-                if (args.length == 1) {
-                    sender.sendMessage(message("Please enter the API key for this server."));
-                    return false;
-                }
-                // Set the server API key
-                plugin.getConfigFile().setServerApiKey(args[1]);
-                sender.sendMessage(message("Server API key has been successfully set."));
-                return true;
+                return this.verifyServer(args, sender);
             }
 
             if (commandKey.equalsIgnoreCase("setScheduler")) {
@@ -215,11 +211,66 @@ public class CommandGameCMS implements CommandExecutor {
             }
 
 
+            if (commandKey.equalsIgnoreCase("server-verify")) {
+                if (!this.hasPermission("gamecms.api.key.server", sender)) {
+                    sender.sendMessage(noPermission());
+                    return false;
+                }
+                return this.verifyServer(args, sender);
+            }
+
         }
 
-        sender.sendMessage(message("Find everything for this plugin here: " + ChatColor.WHITE + "https://docs.gamecms.org/24"));
+        sender.sendMessage(message("Find everything for this plugin here: " + ChatColor.WHITE + "https://docs.gamecms.org/integrations/servers/minecraft-server-plugin"));
         return true;
     }
+
+    private Boolean verifyServer(String[] args, CommandSender sender) {
+        if (!this.hasPermission("gamecms.server.verify", sender)) {
+            sender.sendMessage(noPermission());
+            return false;
+        }
+        if (args.length == 1) {
+            sender.sendMessage(message("Please enter the verification token."));
+            return false;
+        }
+
+        // Get the server's IP address and port
+        String serverIp = getExternalIpAddress();
+        int serverPort = Bukkit.getServer().getPort();
+
+        String token = args[1];
+
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                String response = plugin.getApiBase().verifyServer(token, serverIp, serverPort);
+                Gson gson = new Gson();
+                BasicRequestResponse responseResult = gson.fromJson(response, BasicRequestResponse.class);
+                if (responseResult.status == 200) {
+                    plugin.getConfigFile().setServerApiKey(token);
+                }
+                sender.sendMessage(message(responseResult.message));
+            } catch (Exception e) {
+                plugin.getLogger().info(e.getMessage());
+            }
+        });
+
+        return true;
+    }
+
+    private String getExternalIpAddress() {
+        try {
+            URL url = new URL("http://checkip.amazonaws.com");
+            Scanner scanner = new Scanner(url.openStream());
+            String ip = scanner.nextLine();
+            scanner.close();
+            return ip;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "127.0.0.1"; // Default to localhost if unable to fetch
+        }
+    }
+
 
     private String message(String message) {
         return ChatColor.translateAlternateColorCodes('&', "&f&l[&9GameCMS&f&l] &7&l" + message);

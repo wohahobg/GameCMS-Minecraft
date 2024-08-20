@@ -10,6 +10,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+
 public class HTTPRequest {
 
 
@@ -56,7 +61,6 @@ public class HTTPRequest {
         BufferedReader reader;
         String line;
         StringBuilder responseContent = new StringBuilder();
-        //simple add empty json status as null so we can check easy if the status is 200 or etc.
         String result = BasicRequestResponse.bad_request_format;
         int responseCode = connection.getResponseCode();
 
@@ -73,8 +77,17 @@ public class HTTPRequest {
             connection.connect();
             result = responseContent.toString();
 
+            JsonParser parser = new JsonParser();
+            JsonElement jsonElement = parser.parse(result);
+            if (jsonElement.isJsonObject()) {
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+                jsonObject.addProperty("status", responseCode);
+                result = jsonObject.toString();
+            }
         }
         return result;
     }
+
 
 }

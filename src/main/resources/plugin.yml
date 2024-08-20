@@ -28,7 +28,7 @@ permissions:
     description: Execute a forced action.
     default: op
   gamecms.api.key.server:
-    description: Set the server API key.
+    description: Verify the server wtih GameCMS API
     default: op
   gamecms.api.key.website:
     description: Set the website API key.

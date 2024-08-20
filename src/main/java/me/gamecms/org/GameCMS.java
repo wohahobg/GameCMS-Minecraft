@@ -54,13 +54,13 @@ public class GameCMS extends JavaPlugin{
         webStore = new WebStore(this);
         playerListener = new PlayerJoinQuit(this);
 
-        // Start the HTTP server with the port from the config file
-        int httpPort = getConfigFile().getHttpPort();
-        try {
-          httpSever = new GameCMSHttpServer(this, httpPort);
-        } catch (IOException e) {
-            getLogger().severe("Failed to start the HTTP server: " + e.getMessage());
-        }
+//        // Start the HTTP server with the port from the config file
+//        int httpPort = getConfigFile().getHttpPort();
+//        try {
+//          httpSever = new GameCMSHttpServer(this, httpPort);
+//        } catch (IOException e) {
+//            getLogger().severe("Failed to start the HTTP server: " + e.getMessage());
+//        }
 
         //load event listener
         getServer().getPluginManager().registerEvents(playerListener, this);
@@ -72,11 +72,11 @@ public class GameCMS extends JavaPlugin{
     public void onDisable() {
         webStore.stop();
         playerListener.stopTasks();
-        try {
-            httpSever.stop();
-        } catch (Exception e) {
-            getLogger().severe("Error while stopping the HTTP server: " + e.getMessage());
-        }
+//        try {
+//            httpSever.stop();
+//        } catch (Exception e) {
+//            getLogger().severe("Error while stopping the HTTP server: " + e.getMessage());
+//        }
     }
 
     public static GameCMS getInstance() {
