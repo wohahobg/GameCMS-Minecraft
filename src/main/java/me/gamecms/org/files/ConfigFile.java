@@ -67,7 +67,7 @@ public class ConfigFile {
         return settings.getProperty(PluginConfigProperties.USE_PLACEHOLDERS);
     }
 
-    public int getHttpPort() {
-        return settings.getProperty(PluginConfigProperties.HTTP_PORT);
-    }
+//    public int getHttpPort() {
+//        return settings.getProperty(PluginConfigProperties.HTTP_PORT);
+//    }
 }

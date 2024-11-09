@@ -35,7 +35,7 @@ public class ApiBase {
 
 
     public String sendWebsiteApiRequest(String params, String uri, String method) throws IOException {
-        return this.sendRequest(uri, params, method, plugin.getConfigFile().getWebsiteApiKey());
+        return this.sendRequest(params, uri, method, plugin.getConfigFile().getWebsiteApiKey());
     }
 
     public String sendRequest(String params, String uri, String method, String token) throws IOException {

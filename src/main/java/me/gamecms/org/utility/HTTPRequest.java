@@ -9,52 +9,66 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.ConnectException;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
 public class HTTPRequest {
 
+    public static String sendPost(String apiURL, String params, String apiKey) {
+        try {
+            URL url = new URL(apiURL);
 
-    public static String sendPost(String apiURL, String params, String apiKey) throws IOException {
+            // Request setup
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
 
-        URL url = new URL(apiURL);
+            // Set headers
+            connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
+            connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+            connection.setRequestProperty("Accept", "application/json");
 
-        //request setup
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
+            // For POST only - START
+            connection.setDoOutput(true);
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(params.getBytes());
+                os.flush();
+            }
+            // For POST only - END
 
-        //set user-agent
-        connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
-        connection.setRequestProperty("Authorization", "Bearer " + apiKey);
-        connection.setRequestProperty("Accept", "application/json");
+            return returnResponse(connection);
 
-        // For POST only - START
-        connection.setDoOutput(true);
-        OutputStream os = connection.getOutputStream();
-        os.write(params.getBytes());
-        os.flush();
-        os.close();
-        // For POST only - END
-
-        return returnResponse(connection);
+        } catch (ConnectException e) {
+            return BasicRequestResponse.bad_request_format.replace("500", "503")
+                    .replace("Something went wrong", "Service unavailable. Connection timed out.");
+        } catch (IOException e) {
+            return BasicRequestResponse.bad_request_format.replace("500", "500")
+                    .replace("Something went wrong", "I/O error occurred: " + e.getMessage());
+        }
     }
 
+    public static String sendGET(String apiURL, String apiKey) {
+        try {
+            URL url = new URL(apiURL);
 
-    public static String sendGET(String apiURL, String apiKey) throws IOException {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-        URL url = new URL(apiURL);
+            connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
+            connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+            connection.setRequestProperty("Accept", "application/json");
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+            return returnResponse(connection);
 
-        connection.setRequestProperty("User-Agent", "Java " + System.getProperty("java.runtime.version"));
-        connection.setRequestProperty("Authorization", "Bearer " + apiKey);
-        connection.setRequestProperty("Accept", "application/json");
-
-        return returnResponse(connection);
+        } catch (ConnectException e) {
+            return BasicRequestResponse.bad_request_format.replace("500", "503")
+                    .replace("Something went wrong", "Service unavailable. Connection timed out.");
+        } catch (IOException e) {
+            return BasicRequestResponse.bad_request_format.replace("500", "500")
+                    .replace("Something went wrong", "I/O error occurred: " + e.getMessage());
+        }
     }
 
     public static String returnResponse(HttpURLConnection connection) throws IOException {
@@ -74,20 +88,16 @@ public class HTTPRequest {
                 responseContent.append(line);
             }
             reader.close();
-            connection.connect();
             result = responseContent.toString();
 
             JsonParser parser = new JsonParser();
             JsonElement jsonElement = parser.parse(result);
             if (jsonElement.isJsonObject()) {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-
                 jsonObject.addProperty("status", responseCode);
                 result = jsonObject.toString();
             }
         }
         return result;
     }
-
-
 }
